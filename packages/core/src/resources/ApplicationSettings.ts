@@ -72,15 +72,15 @@ export interface ApplicationSettingsSchema extends Record<string, unknown> {
 }
 
 export class ApplicationSettings<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean>(
+  all<E extends boolean = false>(
     options?: Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIRecordResponse<C, E, ApplicationSettingsSchema>> {
-    return RequestHelper.get()(this, 'application/settings', options) as any;
+    return RequestHelper.get<ApplicationSettingsSchema>()(this, 'application/settings', options);
   }
 
-  edit<E extends boolean>(
+  edit<E extends boolean = false>(
     options?: BaseRequestOptions<E>,
   ): Promise<GitlabAPIRecordResponse<C, E, ApplicationSettingsSchema>> {
-    return RequestHelper.put()(this, 'application/settings', options) as any;
+    return RequestHelper.put<ApplicationSettingsSchema>()(this, 'application/settings', options);
   }
 }

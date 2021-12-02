@@ -68,20 +68,20 @@ export type GitlabAPIRecordResponse<
   T extends Record<string, unknown> | void,
 > = T extends void
   ? void
-  : E extends false
-  ? CamelizedResponse<C, T>
-  : ExpandedResponse<CamelizedResponse<C, T>>;
+  : E extends true
+  ? ExpandedResponse<CamelizedResponse<C, T>>
+  : CamelizedResponse<C, T>;
 
 export type GitlabAPIArrayResponse<
   C extends boolean,
   E extends boolean,
   T,
   P extends 'keyset' | 'offset',
-> = E extends false
-  ? CamelizedResponse<C, T>[]
-  : P extends 'keyset'
-  ? CamelizedResponse<C, T>[]
-  : PaginationResponse<CamelizedResponse<C, T>[]>;
+> = E extends true
+  ? P extends 'keyset'
+    ? CamelizedResponse<C, T>[]
+    : PaginationResponse<CamelizedResponse<C, T>[]>
+  : CamelizedResponse<C, T>[];
 
 export type GitlabAPIResponse<
   C extends boolean,
