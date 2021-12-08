@@ -6,7 +6,6 @@ import {
   RequestHelper,
   Sudo,
   ShowExpanded,
-  GitlabAPIRecordResponse,
   GitlabAPIResponse,
 } from '../infrastructure';
 
@@ -25,8 +24,8 @@ export interface BranchSchema extends Record<string, unknown> {
 export class Branches<C extends boolean = false> extends BaseResource<C> {
   all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
     projectId: string | number,
-    options?: PaginatedRequestOptions<P, E>,
-  ): Promise<GitlabAPIResponse<C, E, P, BranchSchema[]>> {
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<BranchSchema[], C, E, P>> {
     return RequestHelper.get<BranchSchema[]>()(
       this,
       endpoint`projects/${projectId}/repository/branches`,
@@ -39,7 +38,7 @@ export class Branches<C extends boolean = false> extends BaseResource<C> {
     branchName: string,
     ref: string,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIRecordResponse<C, E, BranchSchema>> {
+  ): Promise<GitlabAPIResponse<BranchSchema, C, E, never>> {
     return RequestHelper.post<BranchSchema>()(
       this,
       endpoint`projects/${projectId}/repository/branches`,
@@ -55,7 +54,7 @@ export class Branches<C extends boolean = false> extends BaseResource<C> {
     projectId: string | number,
     branchName: string,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIRecordResponse<C, E, void>> {
+  ): Promise<GitlabAPIResponse<void, C, E, never>> {
     return RequestHelper.del()(
       this,
       endpoint`projects/${projectId}/repository/branches/${branchName}`,
@@ -66,7 +65,7 @@ export class Branches<C extends boolean = false> extends BaseResource<C> {
   removeMerged<E extends boolean = false>(
     projectId: string | number,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIRecordResponse<C, E, void>> {
+  ): Promise<GitlabAPIResponse<void, C, E, never>> {
     return RequestHelper.del()(
       this,
       endpoint`projects/${projectId}/repository/merged_branches`,
@@ -78,7 +77,7 @@ export class Branches<C extends boolean = false> extends BaseResource<C> {
     projectId: string | number,
     branchName: string,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIRecordResponse<C, E, BranchSchema>> {
+  ): Promise<GitlabAPIResponse<BranchSchema, C, E, never>> {
     return RequestHelper.get<BranchSchema>()(
       this,
       endpoint`projects/${projectId}/repository/branches/${branchName}`,

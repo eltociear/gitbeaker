@@ -3,7 +3,7 @@ import {
   RequestHelper,
   Sudo,
   BaseRequestOptions,
-  GitlabAPIRecordResponse,
+  GitlabAPIResponse,
   ShowExpanded,
 } from '../infrastructure';
 
@@ -72,15 +72,15 @@ export interface ApplicationSettingsSchema extends Record<string, unknown> {
 }
 
 export class ApplicationSettings<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false>(
+  show<E extends boolean = false>(
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIRecordResponse<C, E, ApplicationSettingsSchema>> {
+  ): Promise<GitlabAPIResponse<ApplicationSettingsSchema, C, E, never>> {
     return RequestHelper.get<ApplicationSettingsSchema>()(this, 'application/settings', options);
   }
 
   edit<E extends boolean = false>(
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIRecordResponse<C, E, ApplicationSettingsSchema>> {
+  ): Promise<GitlabAPIResponse<ApplicationSettingsSchema, C, E, never>> {
     return RequestHelper.put<ApplicationSettingsSchema>()(this, 'application/settings', options);
   }
 }
