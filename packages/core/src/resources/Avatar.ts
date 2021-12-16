@@ -9,7 +9,7 @@ export class Avatars<C extends boolean = false> extends BaseResource<C> {
   show<E extends boolean = false>(
     email: string,
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<AvatarSchema, C, E, never>> {
+  ): Promise<GitlabAPIResponse<AvatarSchema, C, E, void>> {
     return RequestHelper.get<AvatarSchema>()(this, 'avatar', { email, ...options });
   }
 }

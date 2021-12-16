@@ -1,11 +1,12 @@
 import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
 import {
+  endpoint,
   BaseRequestOptions,
   PaginatedRequestOptions,
   RequestHelper,
   Sudo,
   ShowExpanded,
-  endpoint,
+  GitlabAPIResponse,
 } from '../infrastructure';
 
 export interface LabelSchema extends Record<string, unknown> {
@@ -28,16 +29,19 @@ export class ResourceLabels<C extends boolean = false> extends BaseResource<C> {
     super({ prefixUrl: resourceType, ...options });
   }
 
-  all(resourceId: string | number, options?: PaginatedRequestOptions) {
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    resourceId: string | number,
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<LabelSchema[], C, E, P>> {
     return RequestHelper.get<LabelSchema[]>()(this, endpoint`${resourceId}/labels`, options);
   }
 
-  create(
+  create<E extends boolean = false>(
     resourceId: string | number,
     labelName: string,
     color: string,
-    options?: BaseRequestOptions,
-  ) {
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<LabelSchema, C, E, void>> {
     return RequestHelper.post<LabelSchema>()(this, endpoint`${resourceId}/labels`, {
       name: labelName,
       color,
@@ -45,7 +49,11 @@ export class ResourceLabels<C extends boolean = false> extends BaseResource<C> {
     });
   }
 
-  edit(resourceId: string | number, labelId: number | string, options?: BaseRequestOptions) {
+  edit<E extends boolean = false>(
+    resourceId: string | number,
+    labelId: number | string,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<LabelSchema, C, E, void>> {
     return RequestHelper.put<LabelSchema>()(
       this,
       endpoint`${resourceId}/labels/${labelId}`,
@@ -53,11 +61,19 @@ export class ResourceLabels<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  remove(resourceId: string | number, labelId: number | string, options?: Sudo & ShowExpanded) {
+  remove<E extends boolean = false>(
+    resourceId: string | number,
+    labelId: number | string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(this, endpoint`${resourceId}/labels/${labelId}`, options);
   }
 
-  subscribe(resourceId: string | number, labelId: number | string, options?: Sudo & ShowExpanded) {
+  subscribe<E extends boolean = false>(
+    resourceId: string | number,
+    labelId: number | string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<LabelSchema, C, E, void>> {
     return RequestHelper.post<LabelSchema>()(
       this,
       endpoint`${resourceId}/issues/${labelId}/subscribe`,
@@ -65,11 +81,11 @@ export class ResourceLabels<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  unsubscribe(
+  unsubscribe<E extends boolean = false>(
     resourceId: string | number,
     labelId: number | string,
-    options?: Sudo & ShowExpanded,
-  ) {
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<LabelSchema, C, E, void>> {
     return RequestHelper.post<LabelSchema>()(
       this,
       endpoint`${resourceId}/issues/${labelId}/unsubscribe`,

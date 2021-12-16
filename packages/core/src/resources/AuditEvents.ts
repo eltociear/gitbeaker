@@ -59,7 +59,7 @@ export class AuditEvents<C extends boolean = false> extends BaseResource<C> {
     auditEventId: number,
     options: { projectId?: string | number; groupId?: string | number } & Sudo &
       ShowExpanded<E> = {},
-  ): Promise<GitlabAPIResponse<AuditEventSchema, C, E, never>> {
+  ): Promise<GitlabAPIResponse<AuditEventSchema, C, E, void>> {
     const uri = url(options);
 
     return RequestHelper.get<AuditEventSchema>()(this, `${uri}/${auditEventId}`, options);

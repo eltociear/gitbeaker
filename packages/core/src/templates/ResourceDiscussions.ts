@@ -1,11 +1,13 @@
 import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { UserSchema } from '../resources/Users';
 import {
-  BaseRequestOptions,
   endpoint,
+  BaseRequestOptions,
   PaginatedRequestOptions,
   RequestHelper,
   Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
 } from '../infrastructure';
 
 export interface DiscussionNotePosition {
@@ -19,7 +21,7 @@ export interface DiscussionNotePosition {
   new_line: number;
 }
 
-export interface DiscussionNote {
+export interface DiscussionNote extends Record<string, unknown> {
   id: number;
   type?: string;
   body: string;
@@ -50,26 +52,26 @@ export class ResourceDiscussions<C extends boolean = false> extends BaseResource
     this.resource2Type = resource2Type;
   }
 
-  addNote(
+  addNote<E extends boolean = false>(
     resourceId: string | number,
     resource2Id: string | number,
     discussionId: string | number,
     noteId: number,
     body: string,
-    options?: BaseRequestOptions,
-  ) {
-    return RequestHelper.post()(
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<DiscussionNote, C, E, void>> {
+    return RequestHelper.post<DiscussionNote>()(
       this,
       endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions/${discussionId}/notes`,
       { query: { body }, noteId, ...options },
     );
   }
 
-  all(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
     resourceId: string | number,
     resource2Id: string | number,
-    options?: PaginatedRequestOptions,
-  ) {
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<DiscussionSchema[], C, E, P>> {
     return RequestHelper.get<DiscussionSchema[]>()(
       this,
       endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions`,
@@ -77,12 +79,12 @@ export class ResourceDiscussions<C extends boolean = false> extends BaseResource
     );
   }
 
-  create(
+  create<E extends boolean = false>(
     resourceId: string | number,
     resource2Id: string | number,
     body: string,
-    options?: BaseRequestOptions,
-  ) {
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<DiscussionSchema, C, E, void>> {
     return RequestHelper.post<DiscussionSchema>()(
       this,
       endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions`,
@@ -93,13 +95,13 @@ export class ResourceDiscussions<C extends boolean = false> extends BaseResource
     );
   }
 
-  editNote(
+  editNote<E extends boolean = false>(
     resourceId: string | number,
     resource2Id: string | number,
     discussionId: string | number,
     noteId: number,
-    { body, ...options }: BaseRequestOptions & { body?: string } = {},
-  ) {
+    { body, ...options }: BaseRequestOptions<E> & { body?: string } = {},
+  ): Promise<GitlabAPIResponse<DiscussionSchema, C, E, void>> {
     return RequestHelper.put<DiscussionSchema>()(
       this,
       endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions/${discussionId}/notes/${noteId}`,
@@ -110,13 +112,13 @@ export class ResourceDiscussions<C extends boolean = false> extends BaseResource
     );
   }
 
-  removeNote(
+  removeNote<E extends boolean = false>(
     resourceId: string | number,
     resource2Id: string | number,
     discussionId: string | number,
     noteId: number,
-    options?: Sudo,
-  ) {
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
       endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions/${discussionId}/notes/${noteId}`,
@@ -124,12 +126,12 @@ export class ResourceDiscussions<C extends boolean = false> extends BaseResource
     );
   }
 
-  show(
+  show<E extends boolean = false>(
     resourceId: string | number,
     resource2Id: string | number,
     discussionId: string | number,
-    options?: Sudo,
-  ) {
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<DiscussionSchema, C, E, void>> {
     return RequestHelper.get<DiscussionSchema>()(
       this,
       endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions/${discussionId}`,

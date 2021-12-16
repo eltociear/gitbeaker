@@ -1,10 +1,12 @@
 import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
 import {
-  RequestHelper,
-  PaginatedRequestOptions,
-  BaseRequestOptions,
-  Sudo,
   endpoint,
+  BaseRequestOptions,
+  PaginatedRequestOptions,
+  RequestHelper,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
 } from '../infrastructure';
 import { IssueSchema } from '../resources/Issues';
 import { MergeRequestSchema } from '../resources/MergeRequests';
@@ -29,7 +31,10 @@ export class ResourceMilestones<C extends boolean = false> extends BaseResource<
     super({ prefixUrl: resourceType, ...options });
   }
 
-  all(resourceId: string | number, options?: PaginatedRequestOptions) {
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    resourceId: string | number,
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<MilestoneSchema[], C, E, P>> {
     return RequestHelper.get<MilestoneSchema[]>()(
       this,
       endpoint`${resourceId}/milestones`,
@@ -37,14 +42,22 @@ export class ResourceMilestones<C extends boolean = false> extends BaseResource<
     );
   }
 
-  create(resourceId: string | number, title: string, options?: BaseRequestOptions) {
+  create<E extends boolean = false>(
+    resourceId: string | number,
+    title: string,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<MilestoneSchema, C, E, void>> {
     return RequestHelper.post<MilestoneSchema>()(this, endpoint`${resourceId}/milestones`, {
       title,
       ...options,
     });
   }
 
-  edit(resourceId: string | number, milestoneId: number, options?: BaseRequestOptions) {
+  edit<E extends boolean = false>(
+    resourceId: string | number,
+    milestoneId: number,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<MilestoneSchema, C, E, void>> {
     return RequestHelper.put<MilestoneSchema>()(
       this,
       endpoint`${resourceId}/milestones/${milestoneId}`,
@@ -52,7 +65,11 @@ export class ResourceMilestones<C extends boolean = false> extends BaseResource<
     );
   }
 
-  issues(resourceId: string | number, milestoneId: number, options?: Sudo) {
+  issues<E extends boolean = false>(
+    resourceId: string | number,
+    milestoneId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<IssueSchema[], C, E, void>> {
     return RequestHelper.get<IssueSchema[]>()(
       this,
       endpoint`${resourceId}/milestones/${milestoneId}/issues`,
@@ -60,7 +77,11 @@ export class ResourceMilestones<C extends boolean = false> extends BaseResource<
     );
   }
 
-  mergeRequests(resourceId: string | number, milestoneId: number, options?: Sudo) {
+  mergeRequests<E extends boolean = false>(
+    resourceId: string | number,
+    milestoneId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<MergeRequestSchema[], C, E, void>> {
     return RequestHelper.get<MergeRequestSchema[]>()(
       this,
       endpoint`${resourceId}/milestones/${milestoneId}/merge_requests`,
@@ -68,7 +89,11 @@ export class ResourceMilestones<C extends boolean = false> extends BaseResource<
     );
   }
 
-  show(resourceId: string | number, milestoneId: number, options?: Sudo) {
+  show<E extends boolean = false>(
+    resourceId: string | number,
+    milestoneId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<MilestoneSchema, C, E, void>> {
     return RequestHelper.get<MilestoneSchema>()(
       this,
       endpoint`${resourceId}/milestones/${milestoneId}`,

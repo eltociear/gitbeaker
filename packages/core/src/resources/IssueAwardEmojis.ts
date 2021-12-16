@@ -1,35 +1,35 @@
 import { BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { ResourceAwardEmojis } from '../templates';
 import { AwardEmojiSchema } from '../templates/types';
-import { PaginatedRequestOptions, Sudo, CamelizedResponse } from '../infrastructure';
+import { Sudo, PaginatedRequestOptions, GitlabAPIResponse, ShowExpanded } from '../infrastructure';
 
 export interface IssueAwardEmojis<C extends boolean = false> extends ResourceAwardEmojis<C> {
-  all(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
     projectId: string | number,
     issueIId: number,
-    options?: PaginatedRequestOptions,
-  ): Promise<CamelizedResponse<C, AwardEmojiSchema>[]>;
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<AwardEmojiSchema[], C, E, P>>;
 
-  award(
+  award<E extends boolean = false>(
     projectId: string | number,
     issueIId: number,
     name: string,
-    options?: Sudo,
-  ): Promise<CamelizedResponse<C, AwardEmojiSchema>>;
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<AwardEmojiSchema, C, E, void>>;
 
-  remove(
+  remove<E extends boolean = false>(
     projectId: string | number,
     issueIId: number,
     awardId: number,
-    options?: Sudo,
-  ): Promise<void>;
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>>;
 
-  show(
+  show<E extends boolean = false>(
     projectId: string | number,
     issueIId: number,
     awardId: number,
-    options?: Sudo,
-  ): Promise<CamelizedResponse<C, AwardEmojiSchema>>;
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<AwardEmojiSchema, C, E, void>>;
 }
 
 export class IssueAwardEmojis<C extends boolean = false> extends ResourceAwardEmojis<C> {

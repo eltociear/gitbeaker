@@ -38,7 +38,7 @@ export class Branches<C extends boolean = false> extends BaseResource<C> {
     branchName: string,
     ref: string,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<BranchSchema, C, E, never>> {
+  ): Promise<GitlabAPIResponse<BranchSchema, C, E, void>> {
     return RequestHelper.post<BranchSchema>()(
       this,
       endpoint`projects/${projectId}/repository/branches`,
@@ -54,7 +54,7 @@ export class Branches<C extends boolean = false> extends BaseResource<C> {
     projectId: string | number,
     branchName: string,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<void, C, E, never>> {
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
       endpoint`projects/${projectId}/repository/branches/${branchName}`,
@@ -65,7 +65,7 @@ export class Branches<C extends boolean = false> extends BaseResource<C> {
   removeMerged<E extends boolean = false>(
     projectId: string | number,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<void, C, E, never>> {
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
       endpoint`projects/${projectId}/repository/merged_branches`,
@@ -77,7 +77,7 @@ export class Branches<C extends boolean = false> extends BaseResource<C> {
     projectId: string | number,
     branchName: string,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<BranchSchema, C, E, never>> {
+  ): Promise<GitlabAPIResponse<BranchSchema, C, E, void>> {
     return RequestHelper.get<BranchSchema>()(
       this,
       endpoint`projects/${projectId}/repository/branches/${branchName}`,

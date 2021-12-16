@@ -1,10 +1,12 @@
 import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
 import {
-  BaseRequestOptions,
   endpoint,
+  BaseRequestOptions,
   PaginatedRequestOptions,
   RequestHelper,
   Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
 } from '../infrastructure';
 
 export type DeployTokenScope =
@@ -28,12 +30,12 @@ export class ResourceDeployTokens<C extends boolean = false> extends BaseResourc
     super({ prefixUrl: resourceType, ...options });
   }
 
-  add(
+  add<E extends boolean = false>(
     resourceId: string | number,
     tokenName: string,
     tokenScopes: DeployTokenScope[],
-    options?: BaseRequestOptions,
-  ) {
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<DeployTokenSchema, C, E, void>> {
     return RequestHelper.post<DeployTokenSchema>()(this, endpoint`${resourceId}/deploy_tokens`, {
       name: tokenName,
       scopes: tokenScopes,
@@ -41,25 +43,26 @@ export class ResourceDeployTokens<C extends boolean = false> extends BaseResourc
     });
   }
 
-  all({
-    resourceId,
-    projectId,
-    groupId,
-    ...options
-  }: {
-    resourceId?: string | number;
-    projectId?: string | number;
-    groupId?: string | number;
-  } & PaginatedRequestOptions = {}) {
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    options: {
+      resourceId?: string | number;
+      projectId?: string | number;
+      groupId?: string | number;
+    } & PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<DeployTokenSchema[], C, E, P>> {
     const prefix =
-      resourceId || projectId || groupId
-        ? endpoint`${(resourceId || projectId || groupId) as string}/`
+      options.resourceId || options.projectId || options.groupId
+        ? endpoint`${(options.resourceId || options.projectId || options.groupId) as string}/`
         : '';
 
     return RequestHelper.get<DeployTokenSchema[]>()(this, `${prefix}deploy_tokens`, options);
   }
 
-  remove(resourceId: string | number, tokenId: number, options?: Sudo) {
+  remove<E extends boolean = false>(
+    resourceId: string | number,
+    tokenId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(this, endpoint`${resourceId}/deploy_tokens/${tokenId}`, options);
   }
 }

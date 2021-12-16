@@ -1,5 +1,11 @@
 import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
-import { RequestHelper, PaginatedRequestOptions, Sudo } from '../infrastructure';
+import {
+  PaginatedRequestOptions,
+  RequestHelper,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export interface TemplateSchema extends Record<string, unknown> {
   name: string;
@@ -11,11 +17,16 @@ export class ResourceTemplates<C extends boolean = false> extends BaseResource<C
     super({ prefixUrl: ['templates', resourceType].join('/'), ...options });
   }
 
-  all(options?: PaginatedRequestOptions) {
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<TemplateSchema[], C, E, P>> {
     return RequestHelper.get<TemplateSchema[]>()(this, '', options);
   }
 
-  show(key: string | number, options?: Sudo) {
+  show<E extends boolean = false>(
+    key: string | number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<TemplateSchema, C, E, void>> {
     return RequestHelper.get<TemplateSchema>()(this, encodeURIComponent(key), options);
   }
 }

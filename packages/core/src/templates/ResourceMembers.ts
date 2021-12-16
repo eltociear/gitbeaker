@@ -1,10 +1,12 @@
 import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
 import {
-  BaseRequestOptions,
   endpoint,
+  BaseRequestOptions,
   PaginatedRequestOptions,
   RequestHelper,
   Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
 } from '../infrastructure';
 import { AccessLevel } from './ResourceAccessRequests';
 
@@ -34,12 +36,12 @@ export class ResourceMembers<C extends boolean = false> extends BaseResource<C> 
     super({ prefixUrl: resourceType, ...options });
   }
 
-  add(
+  add<E extends boolean = false>(
     resourceId: string | number,
     userId: number,
     accessLevel: AccessLevel,
-    options?: BaseRequestOptions,
-  ) {
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<MemberSchema, C, E, void>> {
     return RequestHelper.post<MemberSchema>()(this, endpoint`${resourceId}/members`, {
       userId: String(userId),
       accessLevel,
@@ -47,35 +49,35 @@ export class ResourceMembers<C extends boolean = false> extends BaseResource<C> 
     });
   }
 
-  all(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
     resourceId: string | number,
-    { includeInherited, ...options }: IncludeInherited & PaginatedRequestOptions = {},
-  ) {
+    options: IncludeInherited & PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<MemberSchema[], C, E, P>> {
     const rId = encodeURIComponent(resourceId);
     const url = [rId, 'members'];
 
-    if (includeInherited) url.push('all');
+    if (options.includeInherited) url.push('all');
 
     return RequestHelper.get<MemberSchema[]>()(this, url.join('/'), options);
   }
 
-  edit(
+  edit<E extends boolean = false>(
     resourceId: string | number,
     userId: number,
     accessLevel: AccessLevel,
-    options?: BaseRequestOptions,
-  ) {
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<MemberSchema, C, E, void>> {
     return RequestHelper.put<MemberSchema>()(this, endpoint`${resourceId}/members/${userId}`, {
       accessLevel,
       ...options,
     });
   }
 
-  show(
+  show<E extends boolean = false>(
     resourceId: string | number,
     userId: number,
-    { includeInherited, ...options }: IncludeInherited & Sudo = {},
-  ) {
+    { includeInherited, ...options }: IncludeInherited & Sudo & ShowExpanded<E> = {},
+  ): Promise<GitlabAPIResponse<MemberSchema, C, E, void>> {
     const [rId, uId] = [resourceId, userId].map(encodeURIComponent);
     const url = [rId, 'members'];
 
@@ -90,7 +92,11 @@ export class ResourceMembers<C extends boolean = false> extends BaseResource<C> 
     );
   }
 
-  remove(resourceId: string | number, userId: number, options?: Sudo) {
+  remove<E extends boolean = false>(
+    resourceId: string | number,
+    userId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(this, endpoint`${resourceId}/members/${userId}`, options);
   }
 }

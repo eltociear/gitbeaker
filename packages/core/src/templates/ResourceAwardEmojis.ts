@@ -1,6 +1,12 @@
 import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { UserSchema } from '../resources/Users';
-import { PaginatedRequestOptions, RequestHelper, Sudo } from '../infrastructure';
+import {
+  PaginatedRequestOptions,
+  RequestHelper,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export interface AwardEmojiSchema extends Record<string, unknown> {
   id: number;
@@ -16,17 +22,17 @@ export function url(
   projectId: number | string,
   resourceType: string,
   resourceId: number | string,
-  awardId?: number | null,
+  awardId?: number,
   noteId?: number,
 ) {
   const [pId, rId] = [projectId, resourceId].map(encodeURIComponent);
-  const output = [pId, resourceType, rId];
+  const output: (string | number)[] = [pId, resourceType, rId];
 
-  if (noteId) output.push('notes', encodeURIComponent(noteId));
+  if (noteId) output.push('notes', noteId);
 
   output.push('award_emoji');
 
-  if (awardId) output.push(encodeURIComponent(awardId));
+  if (awardId) output.push(awardId);
 
   return output.join('/');
 }
@@ -40,7 +46,11 @@ export class ResourceAwardEmojis<C extends boolean = false> extends BaseResource
     this.resourceType = resourceType;
   }
 
-  all(projectId: string | number, resourceIId: number, options?: PaginatedRequestOptions) {
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    projectId: string | number,
+    resourceIId: number,
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<AwardEmojiSchema[], C, E, P>> {
     return RequestHelper.get<AwardEmojiSchema[]>()(
       this,
       url(projectId, this.resourceType, resourceIId),
@@ -48,7 +58,12 @@ export class ResourceAwardEmojis<C extends boolean = false> extends BaseResource
     );
   }
 
-  award(projectId: string | number, resourceIId: number, name: string, options?: Sudo) {
+  award<E extends boolean = false>(
+    projectId: string | number,
+    resourceIId: number,
+    name: string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<AwardEmojiSchema, C, E, void>> {
     return RequestHelper.post<AwardEmojiSchema>()(
       this,
       url(projectId, this.resourceType, resourceIId),
@@ -59,7 +74,12 @@ export class ResourceAwardEmojis<C extends boolean = false> extends BaseResource
     );
   }
 
-  remove(projectId: string | number, resourceIId: number, awardId: number, options?: Sudo) {
+  remove<E extends boolean = false>(
+    projectId: string | number,
+    resourceIId: number,
+    awardId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
       url(projectId, this.resourceType, resourceIId, awardId),
@@ -67,7 +87,12 @@ export class ResourceAwardEmojis<C extends boolean = false> extends BaseResource
     );
   }
 
-  show(projectId: string | number, resourceIId: number, awardId: number, options?: Sudo) {
+  show<E extends boolean = false>(
+    projectId: string | number,
+    resourceIId: number,
+    awardId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<AwardEmojiSchema, C, E, void>> {
     return RequestHelper.get<AwardEmojiSchema>()(
       this,
       url(projectId, this.resourceType, resourceIId, awardId),

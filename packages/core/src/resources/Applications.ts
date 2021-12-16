@@ -27,7 +27,7 @@ export class Applications<C extends boolean = false> extends BaseResource<C> {
     redirectUri: string,
     scopes: string,
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<ApplicationSchema, C, E, never>> {
+  ): Promise<GitlabAPIResponse<ApplicationSchema, C, E, void>> {
     return RequestHelper.post<ApplicationSchema>()(this, 'applications', {
       name,
       redirectUri,
@@ -39,7 +39,7 @@ export class Applications<C extends boolean = false> extends BaseResource<C> {
   remove<E extends boolean = false>(
     applicationId: number,
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<void, C, E, never>> {
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(this, `applications/${applicationId}`, options);
   }
 }

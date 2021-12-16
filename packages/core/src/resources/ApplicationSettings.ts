@@ -74,13 +74,13 @@ export interface ApplicationSettingsSchema extends Record<string, unknown> {
 export class ApplicationSettings<C extends boolean = false> extends BaseResource<C> {
   show<E extends boolean = false>(
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<ApplicationSettingsSchema, C, E, never>> {
+  ): Promise<GitlabAPIResponse<ApplicationSettingsSchema, C, E, void>> {
     return RequestHelper.get<ApplicationSettingsSchema>()(this, 'application/settings', options);
   }
 
   edit<E extends boolean = false>(
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<ApplicationSettingsSchema, C, E, never>> {
+  ): Promise<GitlabAPIResponse<ApplicationSettingsSchema, C, E, void>> {
     return RequestHelper.put<ApplicationSettingsSchema>()(this, 'application/settings', options);
   }
 }

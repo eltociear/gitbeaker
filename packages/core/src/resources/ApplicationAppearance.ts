@@ -25,7 +25,7 @@ export interface ApplicationAppearenceSchema extends Record<string, unknown> {
 export class ApplicationSettings<C extends boolean = false> extends BaseResource<C> {
   show<E extends boolean = false>(
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<ApplicationAppearenceSchema, C, E, never>> {
+  ): Promise<GitlabAPIResponse<ApplicationAppearenceSchema, C, E, void>> {
     return RequestHelper.get<ApplicationAppearenceSchema>()(
       this,
       'application/appearence',
@@ -35,7 +35,7 @@ export class ApplicationSettings<C extends boolean = false> extends BaseResource
 
   edit<E extends boolean = false>(
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<ApplicationAppearenceSchema, C, E, never>> {
+  ): Promise<GitlabAPIResponse<ApplicationAppearenceSchema, C, E, void>> {
     return RequestHelper.put<ApplicationAppearenceSchema>()(
       this,
       'application/appearence',
