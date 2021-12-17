@@ -21,7 +21,7 @@ export interface DiscussionNotePosition {
   new_line: number;
 }
 
-export interface DiscussionNote extends Record<string, unknown> {
+export interface DiscussionNoteSchema extends Record<string, unknown> {
   id: number;
   type?: string;
   body: string;
@@ -40,7 +40,7 @@ export interface DiscussionNote extends Record<string, unknown> {
 export interface DiscussionSchema extends Record<string, unknown> {
   id: string;
   individual_note: boolean;
-  notes?: DiscussionNote[];
+  notes?: DiscussionNoteSchema[];
 }
 
 export class ResourceDiscussions<C extends boolean = false> extends BaseResource<C> {
@@ -59,8 +59,8 @@ export class ResourceDiscussions<C extends boolean = false> extends BaseResource
     noteId: number,
     body: string,
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<DiscussionNote, C, E, void>> {
-    return RequestHelper.post<DiscussionNote>()(
+  ): Promise<GitlabAPIResponse<DiscussionNoteSchema, C, E, void>> {
+    return RequestHelper.post<DiscussionNoteSchema>()(
       this,
       endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions/${discussionId}/notes`,
       { query: { body }, noteId, ...options },

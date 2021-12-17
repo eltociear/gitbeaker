@@ -39,7 +39,7 @@ export type PaginatedRequestOptions<
   P extends 'keyset' | 'offset' | void = 'keyset',
 > = P extends 'keyset'
   ? BasePaginationRequestOptions<E, P>
-  : BasePaginationRequestOptions<E, P> & OffsetPaginationRequestOptions
+  : BasePaginationRequestOptions<E, P> & OffsetPaginationRequestOptions;
 
 // Response Formats
 export interface ExpandedResponse<T = Record<string, unknown>> {
@@ -94,7 +94,10 @@ export type GitlabAPIResponse<
   ? GitlabAPIArrayResponse<R, C, E, P>
   : void;
 
-async function getHelper<E extends boolean = false, P extends 'keyset' | 'offset' | void = 'keyset'>(
+async function getHelper<
+  E extends boolean = false,
+  P extends 'keyset' | 'offset' | void = 'keyset',
+>(
   service: BaseResource<boolean>,
   endpoint: string,
   options: PaginatedRequestOptions<E, P> & { maxPages?: number },
@@ -162,11 +165,11 @@ export function get<
   return <
     C extends boolean,
     E extends boolean = false,
-    P extends 'keyset' | 'offset' | void = void
+    P extends 'keyset' | 'offset' | void = void,
   >(
     service: BaseResource<C>,
     endpoint: string,
-    options?: PaginatedRequestOptions<E,P>
+    options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<T, C, E, P>> => getHelper<E, P>(service, endpoint, options as any);
 }
 
