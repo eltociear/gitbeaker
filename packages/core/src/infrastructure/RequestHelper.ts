@@ -23,7 +23,7 @@ export type BaseRequestOptions<E extends boolean = false> = Record<string, unkno
 
 export type BasePaginationRequestOptions<
   E extends boolean = false,
-  P extends 'keyset' | 'offset' = 'keyset',
+  P extends 'keyset' | 'offset' | void = 'keyset',
 > = BaseRequestOptions<E> & {
   pagination?: P;
   perPage?: number;
@@ -35,11 +35,11 @@ export type OffsetPaginationRequestOptions = {
 };
 
 export type PaginatedRequestOptions<
-  E extends boolean = false,
-  P extends 'keyset' | 'offset' = 'keyset',
+  E extends boolean,
+  P extends 'keyset' | 'offset' | void = 'keyset',
 > = P extends 'keyset'
   ? BasePaginationRequestOptions<E, P>
-  : BasePaginationRequestOptions<E, P> & OffsetPaginationRequestOptions;
+  : BasePaginationRequestOptions<E, P> & OffsetPaginationRequestOptions
 
 // Response Formats
 export interface ExpandedResponse<T = Record<string, unknown>> {
@@ -76,7 +76,7 @@ export type GitlabAPIArrayResponse<
   T,
   C extends boolean,
   E extends boolean,
-  P extends 'keyset' | 'offset',
+  P extends 'keyset' | 'offset' | void,
 > = E extends true
   ? P extends 'keyset'
     ? CamelizedResponse<T, C>[]
@@ -87,24 +87,20 @@ export type GitlabAPIResponse<
   T extends Record<string, unknown> | Record<string, unknown>[] | void,
   C extends boolean,
   E extends boolean,
-  P extends 'keyset' | 'offset',
+  P extends 'keyset' | 'offset' | void,
 > = T extends Record<string, unknown>
   ? GitlabAPIRecordResponse<T, C, E>
   : T extends (infer R)[]
   ? GitlabAPIArrayResponse<R, C, E, P>
   : void;
 
-async function getHelper<P extends 'keyset' | 'offset', E extends boolean>(
+async function getHelper<E extends boolean = false, P extends 'keyset' | 'offset' | void = 'keyset'>(
   service: BaseResource<boolean>,
   endpoint: string,
-  {
-    sudo,
-    showExpanded,
-    maxPages,
-    ...query
-  }: BasePaginationRequestOptions<E, P> & { maxPages?: number } = {},
+  options: PaginatedRequestOptions<E, P> & { maxPages?: number },
   acc: Record<string, unknown>[] = [],
 ): Promise<any> {
+  const { sudo, showExpanded, maxPages, ...query } = options || {};
   const response = await service.requester.get(endpoint, { query, sudo });
   const { headers, status } = response;
   let { body } = response;
@@ -163,11 +159,15 @@ async function getHelper<P extends 'keyset' | 'offset', E extends boolean>(
 export function get<
   T extends Record<string, unknown> | Record<string, unknown>[] = Record<string, unknown>,
 >() {
-  return <C extends boolean, P extends 'keyset' | 'offset' = 'offset', E extends boolean = false>(
+  return <
+    C extends boolean,
+    E extends boolean = false,
+    P extends 'keyset' | 'offset' | void = void
+  >(
     service: BaseResource<C>,
     endpoint: string,
-    options?: PaginatedRequestOptions<E, P> & Record<string, any>,
-  ): Promise<GitlabAPIResponse<T, C, E, P>> => getHelper(service, endpoint, options);
+    options?: PaginatedRequestOptions<E,P>
+  ): Promise<GitlabAPIResponse<T, C, E, P>> => getHelper<E, P>(service, endpoint, options as any);
 }
 
 export function post<T extends Record<string, unknown> | void = Record<string, unknown>>() {
