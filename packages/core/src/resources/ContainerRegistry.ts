@@ -1,5 +1,12 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { RequestHelper, PaginatedRequestOptions, Sudo, endpoint } from '../infrastructure';
+import {
+  endpoint,
+  PaginatedRequestOptions,
+  RequestHelper,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export interface RegistryRepositoryTagSchema extends Record<string, unknown> {
   name: string;
@@ -11,6 +18,11 @@ export interface RegistryRepositoryTagSchema extends Record<string, unknown> {
   created_at: string;
   total_size: number;
 }
+
+export type CondensedRegistryRepositoryTagSchema = Pick<
+  RegistryRepositoryTagSchema,
+  'name' | 'path' | 'location'
+>;
 
 export interface RegistryRepositorySchema extends Record<string, unknown> {
   id: number;
@@ -25,7 +37,10 @@ export interface RegistryRepositorySchema extends Record<string, unknown> {
 }
 
 export class ContainerRegistry<C extends boolean = false> extends BaseResource<C> {
-  projectRepositories(projectId: string | number, options?: PaginatedRequestOptions) {
+  projectRepositories<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    projectId: string | number,
+    options?: PaginatedRequestOptions<E, P>,
+  ) {
     return RequestHelper.get<Omit<RegistryRepositorySchema, 'tags' | 'tags_count'>[]>()(
       this,
       endpoint`projects/${projectId}/registry/repositories`,
@@ -33,7 +48,10 @@ export class ContainerRegistry<C extends boolean = false> extends BaseResource<C
     );
   }
 
-  groupRepositories(projectId: string | number, options?: PaginatedRequestOptions) {
+  groupRepositories<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    projectId: string | number,
+    options?: PaginatedRequestOptions<E, P>,
+  ) {
     return RequestHelper.get<Omit<RegistryRepositorySchema, 'tags' | 'tags_count'>[]>()(
       this,
       endpoint`groups/${projectId}/registry/repositories`,
@@ -41,7 +59,11 @@ export class ContainerRegistry<C extends boolean = false> extends BaseResource<C
     );
   }
 
-  showRepository(projectId: string | number, repositoryId: number, options?: Sudo) {
+  showRepository<E extends boolean = false>(
+    projectId: string | number,
+    repositoryId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<RegistryRepositorySchema, C, E, void>> {
     return RequestHelper.get<RegistryRepositorySchema>()(
       this,
       endpoint`projects/${projectId}/registry/repositories/${repositoryId}`,
@@ -49,15 +71,23 @@ export class ContainerRegistry<C extends boolean = false> extends BaseResource<C
     );
   }
 
-  tags(projectId: string | number, repositoryId: number, options?: PaginatedRequestOptions) {
-    return RequestHelper.get<Pick<RegistryRepositoryTagSchema, 'name' | 'path' | 'location'>[]>()(
+  tags<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    projectId: string | number,
+    repositoryId: number,
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<CondensedRegistryRepositoryTagSchema[], C, E, P>> {
+    return RequestHelper.get<CondensedRegistryRepositoryTagSchema[]>()(
       this,
       endpoint`projects/${projectId}/registry/repositories/${repositoryId}/tags`,
       options,
     );
   }
 
-  removeRepository(projectId: string | number, repositoryId: number, options?: Sudo) {
+  removeRepository<E extends boolean = false>(
+    projectId: string | number,
+    repositoryId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
       endpoint`projects/${projectId}/registry/repositories/${repositoryId}`,
@@ -65,7 +95,12 @@ export class ContainerRegistry<C extends boolean = false> extends BaseResource<C
     );
   }
 
-  removeTag(projectId: string | number, repositoryId: number, tagName: string, options?: Sudo) {
+  removeTag<E extends boolean = false>(
+    projectId: string | number,
+    repositoryId: number,
+    tagName: string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
       endpoint`projects/${projectId}/registry/repositories/${repositoryId}/tags/${tagName}`,
@@ -73,12 +108,12 @@ export class ContainerRegistry<C extends boolean = false> extends BaseResource<C
     );
   }
 
-  removeTags(
+  removeTags<E extends boolean = false>(
     projectId: string | number,
     repositoryId: number,
     nameRegexDelete: string,
-    options?: Sudo & { nameRegexKeep: string; keepN: string; olderThan: string },
-  ) {
+    options?: Sudo & { nameRegexKeep: string; keepN: string; olderThan: string } & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
       endpoint`projects/${projectId}/registry/repositories/${repositoryId}/tags`,
@@ -89,7 +124,12 @@ export class ContainerRegistry<C extends boolean = false> extends BaseResource<C
     );
   }
 
-  showTag(projectId: string | number, repositoryId: number, tagName: string, options?: Sudo) {
+  showTag<E extends boolean = false>(
+    projectId: string | number,
+    repositoryId: number,
+    tagName: string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<RegistryRepositoryTagSchema, C, E, void>> {
     return RequestHelper.get<RegistryRepositoryTagSchema>()(
       this,
       endpoint`projects/${projectId}/registry/repositories/${repositoryId}/tags/${tagName}`,
