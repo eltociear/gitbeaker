@@ -1,10 +1,12 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
 import {
+  BaseRequestOptions,
+  endpoint,
+  PaginatedRequestOptions,
   RequestHelper,
   Sudo,
-  BaseRequestOptions,
-  PaginatedRequestOptions,
-  endpoint,
+  ShowExpanded,
+  GitlabAPIResponse,
 } from '../infrastructure';
 
 export interface DeployKeySchema extends Record<string, unknown> {
@@ -15,16 +17,45 @@ export interface DeployKeySchema extends Record<string, unknown> {
   created_at: string;
 }
 
+export type CondensedDeployKeySchema = Omit<DeployKeySchema, 'can_push'>;
+
+export interface ExpandedDeployKeySchema extends CondensedDeployKeySchema {
+  fingerprint: string;
+  projects_with_write_access?: CondensedProjectSchema[];
+}
+
+export interface CondensedProjectSchema {
+  id: number;
+  description?: null;
+  name: string;
+  name_with_namespace: string;
+  path: string;
+  path_with_namespace: string;
+  created_at: string;
+}
+
 export class DeployKeys<C extends boolean = false> extends BaseResource<C> {
-  add(projectId: string | number, options?: Sudo) {
+  add<E extends boolean = false>(
+    projectId: string | number,
+    title: string,
+    key: string,
+    options?: { canPush?: boolean } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<DeployKeySchema, C, E, void>> {
     return RequestHelper.post<DeployKeySchema>()(
       this,
       endpoint`projects/${projectId}/deploy_keys`,
-      options,
+      {
+        title,
+        key,
+        ...options,
+      },
     );
   }
 
-  all({ projectId, ...options }: { projectId?: string | number } & PaginatedRequestOptions = {}) {
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    options?: { projectId?: string | number } & PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<ExpandedDeployKeySchema[], C, E, P>> {
+    const { projectId, ...opts } = options || {};
     let url: string;
 
     if (projectId) {
@@ -33,10 +64,18 @@ export class DeployKeys<C extends boolean = false> extends BaseResource<C> {
       url = 'deploy_keys';
     }
 
-    return RequestHelper.get<Omit<DeployKeySchema, 'can_push'>[]>()(this, url, options);
+    return RequestHelper.get<ExpandedDeployKeySchema[]>()(
+      this,
+      url,
+      opts as PaginatedRequestOptions<E, P>,
+    );
   }
 
-  edit(projectId: string | number, keyId: number, options?: BaseRequestOptions) {
+  edit<E extends boolean = false>(
+    projectId: string | number,
+    keyId: number,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<DeployKeySchema, C, E, void>> {
     return RequestHelper.put<DeployKeySchema>()(
       this,
       endpoint`projects/${projectId}/deploy_keys/${keyId}`,
@@ -44,19 +83,31 @@ export class DeployKeys<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  enable(projectId: string | number, keyId: number, options?: Sudo) {
-    return RequestHelper.post<Omit<DeployKeySchema, 'can_push'>>()(
+  enable<E extends boolean = false>(
+    projectId: string | number,
+    keyId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<CondensedDeployKeySchema, C, E, void>> {
+    return RequestHelper.post<CondensedDeployKeySchema>()(
       this,
       endpoint`projects/${projectId}/deploy_keys/${keyId}/enable`,
       options,
     );
   }
 
-  remove(projectId: string | number, keyId: number, options?: Sudo) {
+  remove<E extends boolean = false>(
+    projectId: string | number,
+    keyId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(this, endpoint`projects/${projectId}/deploy_keys/${keyId}`, options);
   }
 
-  show(projectId: string | number, keyId: number, options?: Sudo) {
+  show<E extends boolean = false>(
+    projectId: string | number,
+    keyId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<DeployKeySchema, C, E, void>> {
     return RequestHelper.get<DeployKeySchema>()(
       this,
       endpoint`projects/${projectId}/deploy_keys/${keyId}`,

@@ -36,12 +36,17 @@ export interface RegistryRepositorySchema extends Record<string, unknown> {
   tags?: Pick<RegistryRepositoryTagSchema, 'name' | 'path' | 'location'>[];
 }
 
+export type CondensedRegistryRepositorySchema = Omit<
+  RegistryRepositorySchema,
+  'tags' | 'tags_count'
+>;
+
 export class ContainerRegistry<C extends boolean = false> extends BaseResource<C> {
   projectRepositories<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
-  ) {
-    return RequestHelper.get<Omit<RegistryRepositorySchema, 'tags' | 'tags_count'>[]>()(
+  ): Promise<GitlabAPIResponse<CondensedRegistryRepositorySchema[], C, E, P>> {
+    return RequestHelper.get<CondensedRegistryRepositorySchema[]>()(
       this,
       endpoint`projects/${projectId}/registry/repositories`,
       options,
@@ -51,8 +56,8 @@ export class ContainerRegistry<C extends boolean = false> extends BaseResource<C
   groupRepositories<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
-  ) {
-    return RequestHelper.get<Omit<RegistryRepositorySchema, 'tags' | 'tags_count'>[]>()(
+  ): Promise<GitlabAPIResponse<CondensedRegistryRepositorySchema[], C, E, P>> {
+    return RequestHelper.get<CondensedRegistryRepositorySchema[]>()(
       this,
       endpoint`groups/${projectId}/registry/repositories`,
       options,
