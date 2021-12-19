@@ -3,7 +3,7 @@ export { ResourceAwardEmojis } from './ResourceAwardEmojis';
 export { ResourceNoteAwardEmojis } from './ResourceNoteAwardEmojis';
 export { ResourceBadges } from './ResourceBadges';
 export { ResourceCustomAttributes } from './ResourceCustomAttributes';
-export { ResourceDeployTokens } from './ResourceDeployTokens';
+export { ResourceDORA4Metrics } from './ResourceDORA4Metrics';
 export { ResourceDiscussions } from './ResourceDiscussions';
 export { ResourceIssueBoards } from './ResourceIssueBoards';
 export { ResourceLabels } from './ResourceLabels';

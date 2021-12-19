@@ -28,11 +28,11 @@ export type MergeRequestDiscussionNotePositionOptions = (
   line_range?: {
     start?: {
       line_code: string;
-      type: 'new|old';
+      type: 'new' | 'old';
     };
     end?: {
       line_code: string;
-      type: 'new|old';
+      type: 'new' | 'old';
     };
   };
 };

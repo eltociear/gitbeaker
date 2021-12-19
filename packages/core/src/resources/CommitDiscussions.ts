@@ -14,7 +14,7 @@ import {
 } from '../infrastructure';
 
 export type CommitDiscussionNotePositionOptions = DiscussionNotePositionBaseOptions & {
-  position_type: 'text | image';
+  position_type: 'text' | 'image';
   new_path?: string;
   old_path?: string;
 };
