@@ -45,10 +45,11 @@ const url = ({
 
 export class AuditEvents<C extends boolean = false> extends BaseResource<C> {
   all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
-    options: { projectId?: string | number; groupId?: string | number } & PaginatedRequestOptions<
-      E,
-      P
-    > = {} as any,
+    options: (
+      | { projectId?: string | number; groupId?: never }
+      | { groupId?: string | number; projectId?: never }
+    ) &
+      PaginatedRequestOptions<E, P> = {} as any,
   ): Promise<GitlabAPIResponse<AuditEventSchema[], C, E, P>> {
     const uri = url(options);
 
@@ -57,7 +58,11 @@ export class AuditEvents<C extends boolean = false> extends BaseResource<C> {
 
   show<E extends boolean = false>(
     auditEventId: number,
-    options: { projectId?: string | number; groupId?: string | number } & Sudo &
+    options: (
+      | { projectId?: string | number; groupId?: never }
+      | { groupId?: string | number; projectId?: never }
+    ) &
+      Sudo &
       ShowExpanded<E> = {},
   ): Promise<GitlabAPIResponse<AuditEventSchema, C, E, void>> {
     const uri = url(options);

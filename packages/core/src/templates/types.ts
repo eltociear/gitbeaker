@@ -3,7 +3,7 @@ export { AwardEmojiSchema } from './ResourceAwardEmojis';
 export { BadgeSchema } from './ResourceBadges';
 export { CustomAttributeSchema } from './ResourceCustomAttributes';
 export { DeployTokenScope, DeployTokenSchema } from './ResourceDeployTokens';
-export { DiscussionSchema, DiscussionNote, DiscussionNotePosition } from './ResourceDiscussions';
+export { DiscussionSchema, DiscussionNoteSchema, DiscussionNotePositionBaseOptions } from './ResourceDiscussions';
 export { IssueBoardListSchema, IssueBoardSchema } from './ResourceIssueBoards';
 export { LabelSchema } from './ResourceLabels';
 export { MemberSchema, IncludeInherited } from './ResourceMembers';

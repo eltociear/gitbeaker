@@ -1,11 +1,18 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { RequestHelper, PaginatedRequestOptions, Sudo, endpoint } from '../infrastructure';
 import { CommitSchema } from './Commits';
 import { PipelineSchema } from './Pipelines';
 import { UserSchema } from './Users';
 import { RunnerSchema } from './Runners';
 import { EnvironmentSchema } from './Environments';
 import { MergeRequestSchema } from './MergeRequests';
+import {
+  endpoint,
+  PaginatedRequestOptions,
+  RequestHelper,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export type DeploymentStatus = 'created' | 'running' | 'success' | 'failed' | 'canceled';
 
@@ -40,7 +47,10 @@ export type DeploymentSchema = {
 };
 
 export class Deployments<C extends boolean = false> extends BaseResource<C> {
-  all(projectId: string | number, options?: PaginatedRequestOptions) {
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    projectId: string | number,
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<DeploymentSchema[], C, E, P>> {
     return RequestHelper.get<DeploymentSchema[]>()(
       this,
       endpoint`projects/${projectId}/deployments`,
@@ -48,15 +58,14 @@ export class Deployments<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  create(
+  create<E extends boolean = false>(
     projectId: string | number,
     environment: string,
     sha: string,
     ref: string,
     tag: string,
-    status: DeploymentStatus,
-    options?: Sudo,
-  ) {
+    options?: { status?: DeploymentStatus } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<DeploymentSchema, C, E, void>> {
     return RequestHelper.post<DeploymentSchema>()(
       this,
       endpoint`projects/${projectId}/deployments`,
@@ -65,24 +74,28 @@ export class Deployments<C extends boolean = false> extends BaseResource<C> {
         sha,
         ref,
         tag,
-        status,
         ...options,
       },
     );
   }
 
-  edit(projectId: string | number, deploymentId: number, status: DeploymentStatus, options?: Sudo) {
+  edit<E extends boolean = false>(
+    projectId: string | number,
+    deploymentId: number,
+    options?: { status?: DeploymentStatus } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<DeploymentSchema, C, E, void>> {
     return RequestHelper.put<DeploymentSchema>()(
       this,
       endpoint`projects/${projectId}/deployments/${deploymentId}`,
-      {
-        status,
-        ...options,
-      },
+      options,
     );
   }
 
-  show(projectId: string | number, deploymentId: number, options?: Sudo) {
+  show<E extends boolean = false>(
+    projectId: string | number,
+    deploymentId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<DeploymentSchema, C, E, void>> {
     return RequestHelper.get<DeploymentSchema>()(
       this,
       endpoint`projects/${projectId}/deployments/${deploymentId}`,
@@ -90,7 +103,11 @@ export class Deployments<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  mergeRequests(projectId: string | number, deploymentId: number, options?: Sudo) {
+  mergeRequests<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    projectId: string | number,
+    deploymentId: number,
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<MergeRequestSchema[], C, E, P>> {
     return RequestHelper.get<MergeRequestSchema[]>()(
       this,
       endpoint`projects/${projectId}/deployments/${deploymentId}/merge_requests`,

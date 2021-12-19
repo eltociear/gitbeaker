@@ -35,23 +35,6 @@ export interface CondensedProjectSchema {
 }
 
 export class DeployKeys<C extends boolean = false> extends BaseResource<C> {
-  add<E extends boolean = false>(
-    projectId: string | number,
-    title: string,
-    key: string,
-    options?: { canPush?: boolean } & Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<DeployKeySchema, C, E, void>> {
-    return RequestHelper.post<DeployKeySchema>()(
-      this,
-      endpoint`projects/${projectId}/deploy_keys`,
-      {
-        title,
-        key,
-        ...options,
-      },
-    );
-  }
-
   all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
     options?: { projectId?: string | number } & PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<ExpandedDeployKeySchema[], C, E, P>> {
@@ -68,6 +51,23 @@ export class DeployKeys<C extends boolean = false> extends BaseResource<C> {
       this,
       url,
       opts as PaginatedRequestOptions<E, P>,
+    );
+  }
+
+  create<E extends boolean = false>(
+    projectId: string | number,
+    title: string,
+    key: string,
+    options?: { canPush?: boolean } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<DeployKeySchema, C, E, void>> {
+    return RequestHelper.post<DeployKeySchema>()(
+      this,
+      endpoint`projects/${projectId}/deploy_keys`,
+      {
+        title,
+        key,
+        ...options,
+      },
     );
   }
 

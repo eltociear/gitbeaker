@@ -10,15 +10,31 @@ import {
   GitlabAPIResponse,
 } from '../infrastructure';
 
-export interface DiscussionNotePosition {
+export interface DiscussionNotePositionBaseOptions {
   base_sha: string;
   start_sha: string;
   head_sha: string;
-  old_path: string;
-  new_path: string;
-  position_type: string;
-  old_line: number;
-  new_line: number;
+  old_line?: number;
+  new_line?: number;
+  width?: number;
+  height?: number;
+  x?: number;
+  y?: number;
+}
+
+export interface DiscussionNotePositionSchema extends Record<string, unknown> {
+  base_sha: string;
+  start_sha: string;
+  head_sha: string;
+  position_type: 'text' | 'image';
+  old_path?: string;
+  new_path?: string;
+  old_line?: number;
+  new_line?: number;
+  width?: number;
+  height?: number;
+  x?: number;
+  y?: number;
 }
 
 export interface DiscussionNoteSchema extends Record<string, unknown> {
@@ -34,7 +50,7 @@ export interface DiscussionNoteSchema extends Record<string, unknown> {
   noteable_type: string;
   noteable_iid?: number;
   resolvable: boolean;
-  position?: DiscussionNotePosition;
+  position?: DiscussionNotePositionSchema;
 }
 
 export interface DiscussionSchema extends Record<string, unknown> {
@@ -101,8 +117,8 @@ export class ResourceDiscussions<C extends boolean = false> extends BaseResource
     discussionId: string | number,
     noteId: number,
     { body, ...options }: BaseRequestOptions<E> & { body?: string } = {},
-  ): Promise<GitlabAPIResponse<DiscussionSchema, C, E, void>> {
-    return RequestHelper.put<DiscussionSchema>()(
+  ): Promise<GitlabAPIResponse<DiscussionNoteSchema, C, E, void>> {
+    return RequestHelper.put<DiscussionNoteSchema>()(
       this,
       endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/discussions/${discussionId}/notes/${noteId}`,
       {
