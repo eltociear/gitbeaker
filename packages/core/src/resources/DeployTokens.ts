@@ -8,6 +8,13 @@ import {
   GitlabAPIResponse,
 } from '../infrastructure';
 
+export type DeployTokenScope =
+  | 'read_repository'
+  | 'read_registry'
+  | 'write_registry'
+  | 'read_package_registry'
+  | 'write_package_registry';
+
 export interface DeployTokenSchema extends Record<string, unknown> {
   id: number;
   name: string;
@@ -15,7 +22,7 @@ export interface DeployTokenSchema extends Record<string, unknown> {
   expires_at: string;
   revoked: boolean;
   expired: boolean;
-  scopes?: string[];
+  scopes?: DeployTokenScope[];
 }
 
 export class DeployTokens<C extends boolean = false> extends BaseResource<C> {

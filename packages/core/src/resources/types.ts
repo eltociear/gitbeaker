@@ -27,7 +27,7 @@ export {
   X509SignatureSchema,
   MissingSignatureSchema,
   CommitSignatureSchema,
-  CommentSchema,
+  CommitCommentSchema,
   CommitDiffSchema,
   CommitStatusSchema,
   CommitReferenceSchema,
