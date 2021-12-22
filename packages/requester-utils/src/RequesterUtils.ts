@@ -11,6 +11,7 @@ export interface RequesterType {
   get(endpoint: string, options?: Record<string, unknown>): Promise<any>;
   post(endpoint: string, options?: Record<string, unknown>): Promise<any>;
   put(endpoint: string, options?: Record<string, unknown>): Promise<any>;
+  patch(endpoint: string, options?: Record<string, unknown>): Promise<any>;
   delete(endpoint: string, options?: Record<string, unknown>): Promise<any>;
   stream?(endpoint: string, options?: Record<string, unknown>): NodeJS.ReadableStream;
 }
@@ -92,7 +93,7 @@ export function createRequesterFn(
   optionsHandler: OptionsHandlerFn,
   requestHandler: RequestHandlerFn,
 ): (serviceOptions: DefaultResourceOptions) => RequesterType {
-  const methods = ['get', 'post', 'put', 'delete', 'stream'];
+  const methods = ['get', 'post', 'put', 'patch', 'delete', 'stream'];
 
   return (serviceOptions) => {
     const requester: RequesterType = {} as RequesterType;

@@ -2,7 +2,6 @@ export { AccessRequestSchema, AccessLevel } from './ResourceAccessRequests';
 export { AwardEmojiSchema } from './ResourceAwardEmojis';
 export { BadgeSchema } from './ResourceBadges';
 export { CustomAttributeSchema } from './ResourceCustomAttributes';
-export { DeployTokenScope, DeployTokenSchema } from './ResourceDeployTokens';
 export {
   DiscussionSchema,
   DiscussionNoteSchema,

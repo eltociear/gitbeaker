@@ -3,8 +3,8 @@ import * as Resources from '../../../src/resources';
 
 describe('Instantiating services', () => {
   it('should create a valid service object for each export', () => {
-    Object.entries(Resources).forEach(([k, v]) => {
-      const service = new v({
+    Object.entries(Resources).forEach(([k, V]) => {
+      const service = new V({
         requesterFn: jest.fn(),
         token: 'abcdefg',
         requestTimeout: 3000,
