@@ -36,9 +36,11 @@ export interface CondensedProjectSchema {
 
 export class DeployKeys<C extends boolean = false> extends BaseResource<C> {
   all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
-    options?: { projectId?: string | number } & PaginatedRequestOptions<E, P>,
+    {
+      projectId,
+      ...options
+    }: { projectId?: string | number } & PaginatedRequestOptions<E, P> = {} as any,
   ): Promise<GitlabAPIResponse<ExpandedDeployKeySchema[], C, E, P>> {
-    const { projectId, ...opts } = options || {};
     let url: string;
 
     if (projectId) {
@@ -50,7 +52,7 @@ export class DeployKeys<C extends boolean = false> extends BaseResource<C> {
     return RequestHelper.get<ExpandedDeployKeySchema[]>()(
       this,
       url,
-      opts as PaginatedRequestOptions<E, P>,
+      options as PaginatedRequestOptions<E, P>,
     );
   }
 

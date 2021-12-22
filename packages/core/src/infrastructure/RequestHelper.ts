@@ -221,6 +221,30 @@ export function put<T extends Record<string, unknown> = Record<string, unknown>>
   };
 }
 
+export function patch<T extends Record<string, unknown> = Record<string, unknown>>() {
+  return async <C extends boolean, E extends boolean = false>(
+    service: BaseResource<C>,
+    endpoint: string,
+    { query, isForm, sudo, showExpanded, ...options }: IsForm & BaseRequestOptions<E> = {},
+  ): Promise<GitlabAPIRecordResponse<T, C, E>> => {
+    const body = isForm ? appendFormFromObject(options) : options;
+
+    const r = await service.requester.patch(endpoint, {
+      body,
+      query,
+      sudo,
+    });
+
+    return showExpanded
+      ? {
+          data: r.body,
+          status: r.status,
+          headers: r.headers,
+        }
+      : r.body;
+  };
+}
+
 export function del<T extends Record<string, unknown> | void = void>() {
   return async <C extends boolean, E extends boolean = false>(
     service: BaseResource<C>,
