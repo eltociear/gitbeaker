@@ -283,6 +283,7 @@ function stream<C extends boolean>(
 export const RequestHelper = {
   post,
   put,
+  patch,
   get,
   del,
   stream,
