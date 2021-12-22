@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating PackageRegistry service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(PackageRegistry);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('PackageRegistry.publish', () => {
   it('should request PUT projects/:projectId/packages/generic/:packageName/:packageVersion/:filename', async () => {
     await service.publish(1, 'name', 'v1.0', 'filename.txt', 'content');

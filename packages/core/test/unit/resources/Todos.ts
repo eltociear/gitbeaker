@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating Todos service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(Todos);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('Todos.all', () => {
   it('should request GET /todos', async () => {
     await service.all({ test: 1 });

@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating RepositoryFiles service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(RepositoryFiles);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('RepositoryFiles.create', () => {
   it('should request POST /projects/:id/repository/files/:path', async () => {
     await service.create(1, 'path', 'master', 'content', 'message');

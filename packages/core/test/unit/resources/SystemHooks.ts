@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating SystemHooks service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(SystemHooks);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('SystemHooks.all', () => {
   it('should request GET /hooks without options', async () => {
     await service.all();

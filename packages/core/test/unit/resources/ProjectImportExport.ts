@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating ProjectImportExport service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(ProjectImportExport);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('ProjectImportExport.download', () => {
   it('should request GET /projects/:id/export/download', async () => {
     await service.download(1);

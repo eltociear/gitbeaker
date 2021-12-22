@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating ContainerRegistry service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(ContainerRegistry);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('ContainerRegistry.repositories', () => {
   it('should request GET /projects/:id/registry/repositories', async () => {
     await service.projectRepositories(1);

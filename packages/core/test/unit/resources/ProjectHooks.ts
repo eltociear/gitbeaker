@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating ProjectHooks service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(ProjectHooks);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('ProjectHooks.all', () => {
   it('should request GET /projects/:id/hooks without options', async () => {
     await service.all(1);

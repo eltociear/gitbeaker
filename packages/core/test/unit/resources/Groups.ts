@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating Groups service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(Groups);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('Groups.all', () => {
   it('should request GET /groups', async () => {
     await service.all();

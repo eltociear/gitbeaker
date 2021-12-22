@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating Issues service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(Issues);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('Issues.addSpentTime', () => {
   it('should request POST projects/:id/issues:id/add_spent_time', async () => {
     await service.addSpentTime(2, 3, '10m');

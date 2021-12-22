@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating GeoNodes service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(GeoNodes);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('GeoNodes.all', () => {
   it('should request GET /geo_nodes', async () => {
     await service.all();

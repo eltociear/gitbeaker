@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating MergeRequests service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(MergeRequests);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('MergeRequests.accept', () => {
   it('should request PUT projects/:id/merge_requests:id/merge', async () => {
     await service.accept(2, 3);

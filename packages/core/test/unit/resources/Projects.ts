@@ -16,15 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating Projects service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(Projects);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-  });
-});
-
 describe('Projects.all', () => {
   it('should request GET /projects', async () => {
     await service.all();

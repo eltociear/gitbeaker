@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating Runners service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(Runners);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('Runners.all', () => {
   it('should request GET /runners/all', async () => {
     await service.all();

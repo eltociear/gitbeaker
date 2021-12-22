@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating ProtectedBranches service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(ProtectedBranches);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('ProtectedBranches.all', () => {
   it('should request GET /projects/:id/protected_branches', async () => {
     await service.all(1, { test: 1 });

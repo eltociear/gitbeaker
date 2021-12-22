@@ -16,16 +16,6 @@ beforeEach(() => {
   });
 });
 
-describe('Instantiating ProjectSnippets service', () => {
-  it('should create a valid service object', () => {
-    expect(service).toBeInstanceOf(ProjectSnippets);
-    expect(service.url).toBeDefined();
-    expect(service.rejectUnauthorized).toBeTruthy();
-    expect(service.headers).toMatchObject({ 'private-token': 'abcdefg' });
-    expect(service.requestTimeout).toBe(3000);
-  });
-});
-
 describe('ProjectSnippets.all', () => {
   it('should request GET /projects/:id/snippets', async () => {
     await service.all(1);
