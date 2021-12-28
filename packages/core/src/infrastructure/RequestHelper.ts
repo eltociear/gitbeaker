@@ -42,62 +42,65 @@ export type PaginatedRequestOptions<
   : BasePaginationRequestOptions<E, P> & OffsetPaginationRequestOptions;
 
 // Response Formats
-export interface ExpandedResponse<T = Record<string, unknown>> {
+export type CamelizedResponse<T, C> = C extends true ? Camelize<T> : T;
+
+export interface OffsetPagination {
+  total: number;
+  next: number | null;
+  current: number;
+  previous: number | null;
+  perPage: number;
+  totalPages: number;
+}
+
+export interface KeysetPagination {
+  idAfter?: number;
+  cursor?: string;
+}
+
+export interface ExpandedResponse<T> {
   data: T;
   headers: Record<string, unknown>;
   status: number;
 }
 
-export interface PaginationResponse<T = Record<string, unknown>[]> {
+export interface PaginatedResponse<T, I> {
   data: T;
-  paginationInfo: {
-    total: number;
-    next: number | null;
-    current: number;
-    previous: number | null;
-    perPage: number;
-    totalPages: number;
-  };
+  paginationInfo: I;
 }
 
-export type CamelizedResponse<T, C> = C extends true ? Camelize<T> : T;
+export type GitlabAPIExpandedResponse<T, E extends boolean, P> = E extends true
+  ? P extends 'keyset'
+    ? PaginatedResponse<T, KeysetPagination>
+    : P extends 'offset'
+    ? PaginatedResponse<T, OffsetPagination>
+    : ExpandedResponse<T>
+  : T;
 
-export type GitlabAPIRecordResponse<
-  T extends Record<string, unknown> | void,
-  C extends boolean,
-  E extends boolean,
-> = T extends void
-  ? void
-  : E extends true
-  ? ExpandedResponse<CamelizedResponse<T, C>>
-  : CamelizedResponse<T, C>;
+export type GitlabAPISingleResponse<T, C extends boolean, E extends boolean> = T extends Record<
+  string,
+  unknown
+>
+  ? GitlabAPIExpandedResponse<CamelizedResponse<T, C>, E, void>
+  : GitlabAPIExpandedResponse<T, E, void>;
 
-export type GitlabAPIArrayResponse<
+export type GitlabAPIMultiResponse<
   T,
   C extends boolean,
   E extends boolean,
   P extends 'keyset' | 'offset' | void,
-> = E extends true
-  ? P extends 'keyset'
-    ? CamelizedResponse<T, C>[]
-    : PaginationResponse<CamelizedResponse<T, C>[]>
-  : CamelizedResponse<T, C>[];
+> = T extends Record<string, unknown>
+  ? GitlabAPIExpandedResponse<CamelizedResponse<T, C>[], E, P>
+  : GitlabAPIExpandedResponse<T[], E, P>;
 
 export type GitlabAPIResponse<
-  T extends Record<string, unknown> | Record<string, unknown>[] | void,
+  T,
   C extends boolean,
   E extends boolean,
   P extends 'keyset' | 'offset' | void,
-> = T extends Record<string, unknown>
-  ? GitlabAPIRecordResponse<T, C, E>
-  : T extends (infer R)[]
-  ? GitlabAPIArrayResponse<R, C, E, P>
-  : void;
+> = T extends (infer R)[] ? GitlabAPIMultiResponse<R, C, E, P> : GitlabAPISingleResponse<T, C, E>;
 
-async function getHelper<
-  E extends boolean = false,
-  P extends 'keyset' | 'offset' | void = 'keyset',
->(
+async function getHelper<E extends boolean = false, P extends 'keyset' | 'offset' | void = void>(
   service: BaseResource<boolean>,
   endpoint: string,
   options: PaginatedRequestOptions<E, P> & { maxPages?: number },
@@ -108,11 +111,11 @@ async function getHelper<
   const { headers, status } = response;
   let { body } = response;
 
-  // Camelize response body if specified
-  if (service.camelize) body = camelizeKeys(body);
-
-  // Handle object responses
   if (!Array.isArray(body)) {
+    if (Object.keys(body).length > 0) {
+      if (service.camelize) body = camelizeKeys(body);
+    }
+
     if (!showExpanded) return body;
 
     return {
@@ -121,6 +124,8 @@ async function getHelper<
       status,
     };
   }
+  // Camelize response body if specified
+  if (service.camelize) body = camelizeKeys(body);
 
   // Handle array responses
   const newAcc = [...acc, ...body];
@@ -144,24 +149,31 @@ async function getHelper<
     );
   }
 
-  if (!showExpanded || query.pagination === 'keyset') return newAcc;
+  if (!showExpanded) return newAcc;
 
+  if (query.pagination === 'keyset') {
+    return {
+      data: newAcc,
+      paginationInfo: {
+        total: parseInt(headers['x-total'], 10),
+        next: parseInt(headers['x-next-page'], 10) || null,
+        current: parseInt(headers['x-page'], 10) || 1,
+        previous: parseInt(headers['x-prev-page'], 10) || null,
+        perPage: parseInt(headers['x-per-page'], 10),
+        totalPages: parseInt(headers['x-total-pages'], 10),
+      },
+    };
+  }
   return {
     data: newAcc,
     paginationInfo: {
-      total: parseInt(headers['x-total'], 10),
-      next: parseInt(headers['x-next-page'], 10) || null,
-      current: parseInt(headers['x-page'], 10) || 1,
-      previous: parseInt(headers['x-prev-page'], 10) || null,
-      perPage: parseInt(headers['x-per-page'], 10),
-      totalPages: parseInt(headers['x-total-pages'], 10),
+      idAfter: parseInt(next.id_after, 10),
+      cursor: parseInt(next.cursor, 10) || null,
     },
   };
 }
 
-export function get<
-  T extends Record<string, unknown> | Record<string, unknown>[] = Record<string, unknown>,
->() {
+export function get<T>() {
   return <
     C extends boolean,
     E extends boolean = false,
@@ -173,12 +185,12 @@ export function get<
   ): Promise<GitlabAPIResponse<T, C, E, P>> => getHelper<E, P>(service, endpoint, options as any);
 }
 
-export function post<T extends Record<string, unknown> | void = Record<string, unknown>>() {
+export function post<T>() {
   return async <C extends boolean, E extends boolean = false>(
     service: BaseResource<C>,
     endpoint: string,
     { query, isForm, sudo, showExpanded, ...options }: IsForm & BaseRequestOptions<E> = {},
-  ): Promise<GitlabAPIRecordResponse<T, C, E>> => {
+  ): Promise<GitlabAPIResponse<T, C, E, void>> => {
     const body = isForm ? appendFormFromObject(options) : options;
 
     const r = await service.requester.post(endpoint, {
@@ -197,12 +209,12 @@ export function post<T extends Record<string, unknown> | void = Record<string, u
   };
 }
 
-export function put<T extends Record<string, unknown> = Record<string, unknown>>() {
+export function put<T>() {
   return async <C extends boolean, E extends boolean = false>(
     service: BaseResource<C>,
     endpoint: string,
     { query, isForm, sudo, showExpanded, ...options }: IsForm & BaseRequestOptions<E> = {},
-  ): Promise<GitlabAPIRecordResponse<T, C, E>> => {
+  ): Promise<GitlabAPIResponse<T, C, E, void>> => {
     const body = isForm ? appendFormFromObject(options) : options;
 
     const r = await service.requester.put(endpoint, {
@@ -221,12 +233,12 @@ export function put<T extends Record<string, unknown> = Record<string, unknown>>
   };
 }
 
-export function patch<T extends Record<string, unknown> = Record<string, unknown>>() {
+export function patch<T>() {
   return async <C extends boolean, E extends boolean = false>(
     service: BaseResource<C>,
     endpoint: string,
     { query, isForm, sudo, showExpanded, ...options }: IsForm & BaseRequestOptions<E> = {},
-  ): Promise<GitlabAPIRecordResponse<T, C, E>> => {
+  ): Promise<GitlabAPIResponse<T, C, E, void>> => {
     const body = isForm ? appendFormFromObject(options) : options;
 
     const r = await service.requester.patch(endpoint, {
@@ -245,12 +257,12 @@ export function patch<T extends Record<string, unknown> = Record<string, unknown
   };
 }
 
-export function del<T extends Record<string, unknown> | void = void>() {
+export function del<T = void>() {
   return async <C extends boolean, E extends boolean = false>(
     service: BaseResource<C>,
     endpoint: string,
     { sudo, showExpanded, ...query }: BaseRequestOptions<E> = {},
-  ): Promise<GitlabAPIRecordResponse<T, C, E>> => {
+  ): Promise<GitlabAPIResponse<T, C, E, void>> => {
     const r = await service.requester.delete(endpoint, {
       query,
       sudo,
