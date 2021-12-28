@@ -18,11 +18,6 @@ export interface BaseExternalStatusCheckSchema extends Record<string, unknown> {
 
 export type MergeRequestExternalStatusCheckSchema = BaseExternalStatusCheckSchema;
 
-export interface ProjectExternalStatusCheckSchema extends BaseExternalStatusCheckSchema {
-  project_id: number;
-  protected_branches?: ExternalStatusCheckProtectedBranchesSchema[];
-}
-
 export interface ExternalStatusCheckProtectedBranchesSchema {
   id: number;
   project_id: number;
@@ -30,6 +25,11 @@ export interface ExternalStatusCheckProtectedBranchesSchema {
   created_at: string;
   updated_at: string;
   code_owner_approval_required: boolean;
+}
+
+export interface ProjectExternalStatusCheckSchema extends BaseExternalStatusCheckSchema {
+  project_id: number;
+  protected_branches?: ExternalStatusCheckProtectedBranchesSchema[];
 }
 
 export class ExternalStatusChecks<C extends boolean = false> extends BaseResource<C> {
@@ -50,10 +50,10 @@ export class ExternalStatusChecks<C extends boolean = false> extends BaseResourc
       ...options
     }: { mergerequestIId?: number } & PaginatedRequestOptions<E, P> = {} as any,
   ) {
-    let url = endpoint`projects/${projectId}/`;
+    let url = endpoint`projects/${projectId}`;
 
     if (mergerequestIId) {
-      url += 'merge_requests/${mergerequestIId}/status_checks';
+      url += `/merge_requests/${mergerequestIId}/status_checks`;
     } else {
       url += '/external_status_checks';
     }

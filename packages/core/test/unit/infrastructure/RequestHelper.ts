@@ -107,7 +107,7 @@ describe('RequestHelper.get()', () => {
   it('should respond with an object', async () => {
     service.requester.get = jest.fn(() => Promise.resolve(mockedGetOne()));
 
-    const response = await RequestHelper.get()(service, 'test');
+    const response = await RequestHelper.get<Record<string, unknown>>()(service, 'test');
 
     expect(response.prop1).toBe(5);
     expect(response.prop2).toBe('test property');
@@ -184,10 +184,14 @@ describe('RequestHelper.get()', () => {
       Promise.resolve(mockedGetMany(`${service.url}${endpoint}`, { query: options.query })),
     );
 
-    const response = await RequestHelper.get<Record<string, unknown>[]>()(service, 'test', {
-      page: 2,
-      showExpanded: true,
-    });
+    const response = await RequestHelper.get<Record<string, unknown>[]>()<false, true, 'offset'>(
+      service,
+      'test',
+      {
+        page: 2,
+        showExpanded: true,
+      },
+    );
 
     expect(response.data).toHaveLength(2);
 
@@ -259,7 +263,7 @@ describe('RequestHelper.get()', () => {
     });
   });
 
-  it('should not show the pagination information when using keyset pagination and showExpanded is given', async () => {
+  it('should show the pagination information when using keyset pagination and showExpanded is given', async () => {
     service.requester.get = jest.fn((endpoint, options = {}) =>
       Promise.resolve(mockedGetMany(`${service.url}${endpoint}`, { query: options.query })),
     );
@@ -271,8 +275,8 @@ describe('RequestHelper.get()', () => {
 
     expect(response).toHaveLength(20);
 
-    response.forEach((l, index) => {
-      expect(l.prop1).toBe(1 + index);
+    response.data.forEach((l, index) => {
+      expect(l.prop1).toBe(`${1 + index}`);
       expect(l.prop2).toBe(`test property ${1 + index}`);
     });
   });

@@ -1,6 +1,11 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
 import { RequestHelper, PaginatedRequestOptions, GitlabAPIResponse } from '../infrastructure';
 
+export interface ExperimentGateSchema {
+  key: string;
+  value: boolean | number;
+}
+
 export interface ExperimentSchema extends Record<string, unknown> {
   key: string;
   definition: {
@@ -16,11 +21,6 @@ export interface ExperimentSchema extends Record<string, unknown> {
     state: string;
     gates?: ExperimentGateSchema[];
   };
-}
-
-export interface ExperimentGateSchema {
-  key: string;
-  value: boolean | number;
 }
 
 export class Experiments<C extends boolean = false> extends BaseResource<C> {

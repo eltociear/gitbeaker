@@ -19,11 +19,6 @@ export interface DeployKeySchema extends Record<string, unknown> {
 
 export type CondensedDeployKeySchema = Omit<DeployKeySchema, 'can_push'>;
 
-export interface ExpandedDeployKeySchema extends CondensedDeployKeySchema {
-  fingerprint: string;
-  projects_with_write_access?: CondensedProjectSchema[];
-}
-
 export interface CondensedProjectSchema {
   id: number;
   description?: null;
@@ -32,6 +27,11 @@ export interface CondensedProjectSchema {
   path: string;
   path_with_namespace: string;
   created_at: string;
+}
+
+export interface ExpandedDeployKeySchema extends CondensedDeployKeySchema {
+  fingerprint: string;
+  projects_with_write_access?: CondensedProjectSchema[];
 }
 
 export class DeployKeys<C extends boolean = false> extends BaseResource<C> {

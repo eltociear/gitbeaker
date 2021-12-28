@@ -11,19 +11,6 @@ import {
   GitlabAPIResponse,
 } from '../infrastructure';
 
-export interface EpicTodoSchema extends Record<string, unknown> {
-  id: number;
-  group: Pick<GroupSchema, 'id' | 'name' | 'path' | 'kind' | 'full_path' | 'parent_id'>;
-  author: Omit<UserSchema, 'created_at'>;
-  action_name: string;
-  target_type: string;
-  target: EpicSchema;
-  target_url: string;
-  body: string;
-  state: string;
-  created_at: string;
-}
-
 export interface EpicSchema extends Record<string, unknown> {
   id: number;
   iid: number;
@@ -59,6 +46,19 @@ export interface EpicSchema extends Record<string, unknown> {
     epic_issues: string;
     group: string;
   };
+}
+
+export interface EpicTodoSchema extends Record<string, unknown> {
+  id: number;
+  group: Pick<GroupSchema, 'id' | 'name' | 'path' | 'kind' | 'full_path' | 'parent_id'>;
+  author: Omit<UserSchema, 'created_at'>;
+  action_name: string;
+  target_type: string;
+  target: EpicSchema;
+  target_url: string;
+  body: string;
+  state: string;
+  created_at: string;
 }
 
 export class Epics<C extends boolean = false> extends BaseResource<C> {

@@ -1,5 +1,11 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { BaseRequestOptions, RequestHelper, Camelize, endpoint } from '../infrastructure';
+import {
+  endpoint,
+  RequestHelper,
+  BaseRequestOptions,
+  PaginatedRequestOptions,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export interface FreezePeriodSchema extends Record<string, unknown> {
   id: number;
@@ -11,7 +17,10 @@ export interface FreezePeriodSchema extends Record<string, unknown> {
 }
 
 export class FreezePeriods<C extends boolean = false> extends BaseResource<C> {
-  all(projectId: string | number, options?: BaseRequestOptions) {
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+    projectId: string | number,
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<FreezePeriodSchema[], C, E, P>> {
     return RequestHelper.get<FreezePeriodSchema[]>()(
       this,
       endpoint`projects/${projectId}/freeze_periods`,
@@ -19,7 +28,11 @@ export class FreezePeriods<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  show(projectId: string | number, freezePeriodId: number, options?: BaseRequestOptions) {
+  show<E extends boolean = false>(
+    projectId: string | number,
+    freezePeriodId: string | number,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<FreezePeriodSchema, C, E, void>> {
     return RequestHelper.get<FreezePeriodSchema>()(
       this,
       endpoint`projects/${projectId}/freeze_periods/${freezePeriodId}`,
@@ -27,12 +40,12 @@ export class FreezePeriods<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  create(
-    projectId: number | string,
+  create<E extends boolean = false>(
+    projectId: string | number,
     freezeStart: string,
     freezeEnd: string,
-    options?: Camelize<Pick<FreezePeriodSchema, 'cron_timezone'>> & BaseRequestOptions,
-  ) {
+    options?: { cronTimezone?: string } & BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<FreezePeriodSchema, C, E, void>> {
     return RequestHelper.post<FreezePeriodSchema>()(
       this,
       endpoint`projects/${projectId}/freeze_periods`,
@@ -44,12 +57,15 @@ export class FreezePeriods<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  edit(
-    projectId: number | string,
-    freezePeriodId: number,
-    options?: Camelize<Omit<FreezePeriodSchema, 'id' | 'created_at' | 'updated_at'>> &
-      BaseRequestOptions,
-  ) {
+  edit<E extends boolean = false>(
+    projectId: string | number,
+    freezePeriodId: string | number,
+    options?: {
+      freezeStart?: string;
+      freezeEnd?: string;
+      cronTimezone?: string;
+    } & BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<FreezePeriodSchema, C, E, void>> {
     return RequestHelper.put<FreezePeriodSchema>()(
       this,
       endpoint`projects/${projectId}/freeze_periods/${freezePeriodId}`,
@@ -57,7 +73,11 @@ export class FreezePeriods<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  delete(projectId: number | string, freezePeriodId: number, options?: BaseRequestOptions) {
+  remove<E extends boolean = false>(
+    projectId: string | number,
+    freezePeriodId: string | number,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
       endpoint`projects/${projectId}/freeze_periods/${freezePeriodId}`,
