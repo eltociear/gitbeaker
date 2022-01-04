@@ -12,3 +12,5 @@ export { ResourceMilestones } from './ResourceMilestones';
 export { ResourceNotes } from './ResourceNotes';
 export { ResourceTemplates } from './ResourceTemplates';
 export { ResourceVariables } from './ResourceVariables';
+export { ResourceWikis } from './ResourceWikis';
+export { ResourceHooks } from './ResourceHooks';

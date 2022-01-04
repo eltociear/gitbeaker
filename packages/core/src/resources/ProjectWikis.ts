@@ -1,6 +1,6 @@
 import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
-import { ResourceHooks } from '../templates';
-import type { ExpandedHookSchema } from '../templates/types';
+import { ResourceWikis } from '../templates';
+import type { WikiSchema } from '../templates/types';
 import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
@@ -9,42 +9,37 @@ import type {
   GitlabAPIResponse,
 } from '../infrastructure';
 
-export interface ProjectHookSchema extends ExpandedHookSchema {
-  projectId: number;
-}
-
-export interface ProjectHooks<C extends boolean = false> {
-  add<E extends boolean = false>(
-    projectId: string | number,
-    url: string,
-    options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<ProjectHookSchema, C, E, void>>;
-
+export interface ProjectWikis<C extends boolean = false> extends ResourceWikis<C> {
   all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
-  ): Promise<GitlabAPIResponse<ProjectHookSchema[], C, E, P>>;
+  ): Promise<GitlabAPIResponse<WikiSchema[], C, E, P>>;
+
+  create<E extends boolean = false>(
+    projectId: string | number,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<WikiSchema, C, E, void>>;
 
   edit<E extends boolean = false>(
     projectId: string | number,
-    hookId: number,
-    url: string,
+    slug: string,
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<ProjectHookSchema, C, E, void>>;
+  ): Promise<GitlabAPIResponse<WikiSchema, C, E, void>>;
 
   remove<E extends boolean = false>(
     projectId: string | number,
-    hookId: number,
+    slug: string,
     options?: Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<void, C, E, void>>;
+
   show<E extends boolean = false>(
     projectId: string | number,
-    hookId: number,
+    slug: string,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<ProjectHookSchema, C, E, void>>;
+  ): Promise<GitlabAPIResponse<WikiSchema, C, E, void>>;
 }
 
-export class ProjectHooks<C extends boolean = false> extends ResourceHooks<C> {
+export class ProjectWikis<C extends boolean = false> extends ResourceWikis<C> {
   constructor(options: BaseResourceOptions<C>) {
     /* istanbul ignore next */
     super('projects', options);
