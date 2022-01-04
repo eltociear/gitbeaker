@@ -1,12 +1,12 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
+import { RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
-  Camelize,
   ShowExpanded,
   GitlabAPIResponse,
+  Camelize,
 } from '../infrastructure';
 
 export interface BroadcastMessageSchema extends Record<string, unknown> {
@@ -25,7 +25,7 @@ export interface BroadcastMessageSchema extends Record<string, unknown> {
 export type BroadcastMessageOptions = Camelize<Omit<BroadcastMessageSchema, 'id'>>;
 
 export class BroadcastMessages<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<BroadcastMessageSchema[], C, E, P>> {
     return RequestHelper.get<BroadcastMessageSchema[]>()(this, 'broadcast_messages', options);

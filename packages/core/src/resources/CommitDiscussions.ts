@@ -1,17 +1,17 @@
-import { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { ResourceDiscussions } from '../templates';
-import {
-  DiscussionSchema,
-  DiscussionNoteSchema,
-  DiscussionNotePositionBaseOptions,
-} from '../templates/types';
-import {
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
+import type {
+  DiscussionSchema,
+  DiscussionNoteSchema,
+  DiscussionNotePositionBaseOptions,
+} from '../templates/types';
 
 export type CommitDiscussionNotePositionOptions = DiscussionNotePositionBaseOptions & {
   position_type: 'text' | 'image';
@@ -29,7 +29,7 @@ export interface CommitDiscussions<C extends boolean = false> extends ResourceDi
     options?: BaseRequestOptions<E>,
   ): Promise<GitlabAPIResponse<DiscussionNoteSchema, C, E, void>>;
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     commitId: number,
     options?: PaginatedRequestOptions<E, P>,

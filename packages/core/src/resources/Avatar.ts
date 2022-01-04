@@ -1,5 +1,6 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { RequestHelper, GitlabAPIResponse, BaseRequestOptions } from '../infrastructure';
+import { RequestHelper } from '../infrastructure';
+import type { BaseRequestOptions, GitlabAPIResponse } from '../infrastructure';
 
 export interface AvatarSchema extends Record<string, unknown> {
   avatar_url: string;

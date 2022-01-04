@@ -1,13 +1,12 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { CommitSchema } from './Commits';
-import {
-  endpoint,
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
+import type { CommitSchema } from './Commits';
 
 export interface BranchSchema extends Record<string, unknown> {
   name: string;
@@ -22,7 +21,7 @@ export interface BranchSchema extends Record<string, unknown> {
 }
 
 export class Branches<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<BranchSchema[], C, E, P>> {

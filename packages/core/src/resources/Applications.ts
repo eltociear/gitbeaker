@@ -1,8 +1,8 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  RequestHelper,
-  PaginatedRequestOptions,
+import { RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
+  PaginatedRequestOptions,
   GitlabAPIResponse,
 } from '../infrastructure';
 
@@ -16,7 +16,7 @@ export interface ApplicationSchema extends Record<string, unknown> {
 }
 
 export class Applications<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<ApplicationSchema[], C, E, P>> {
     return RequestHelper.get<ApplicationSchema[]>()(this, 'applications', options);

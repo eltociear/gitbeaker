@@ -1,11 +1,6 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  RequestHelper,
-  Sudo,
-  BaseRequestOptions,
-  GitlabAPIResponse,
-  ShowExpanded,
-} from '../infrastructure';
+import { RequestHelper } from '../infrastructure';
+import type { BaseRequestOptions, Sudo, ShowExpanded, GitlabAPIResponse } from '../infrastructure';
 
 export interface ApplicationAppearenceSchema extends Record<string, unknown> {
   title: string;
