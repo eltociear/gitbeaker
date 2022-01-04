@@ -1,15 +1,16 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
 import * as Mime from 'mime/lite';
 import {
-  endpoint,
+  endpoint, RequestHelper
+} from '../infrastructure';
+import type {
   BaseRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
 
-export interface UploadMetadata {
+interface UploadMetadata {
   filename?: string;
   contentType?: string;
 }

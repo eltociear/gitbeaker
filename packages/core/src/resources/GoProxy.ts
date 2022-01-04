@@ -1,5 +1,9 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { RequestHelper, BaseRequestOptions, GitlabAPIResponse } from '../infrastructure';
+import { RequestHelper } from '../infrastructure';
+import type {
+  BaseRequestOptions,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export interface GoProxyModuleVersionSchema extends Record<string, unknown> {
   Version: string;

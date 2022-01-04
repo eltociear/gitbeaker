@@ -1,5 +1,10 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { Sudo, ShowExpanded, RequestHelper, GitlabAPIResponse } from '../infrastructure';
+import { RequestHelper } from '../infrastructure';
+import type {
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export class GitlabPages<C extends boolean = false> extends BaseResource<C> {
   remove<E extends boolean = false>(

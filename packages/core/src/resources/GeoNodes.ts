@@ -142,7 +142,7 @@ export interface GeoNodeStatusSchema extends Record<string, unknown> {
 }
 
 export class GeoNodes<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<GeoNodeSchema[], C, E, P>> {
     return RequestHelper.get<GeoNodeSchema[]>()(this, 'geo_nodes', options);
@@ -168,7 +168,7 @@ export class GeoNodes<C extends boolean = false> extends BaseResource<C> {
     });
   }
 
-  failures<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  failures<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<GeoNodeFailureSchema[], C, E, P>> {
     return RequestHelper.get<GeoNodeFailureSchema[]>()(this, 'geo_nodes/current/failures', options);
@@ -202,7 +202,7 @@ export class GeoNodes<C extends boolean = false> extends BaseResource<C> {
     return RequestHelper.get<GeoNodeStatusSchema>()(this, `geo_nodes/${geonodeId}/status`, options);
   }
 
-  statuses<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  statuses<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<GeoNodeStatusSchema[], C, E, P>> {
     return RequestHelper.get<GeoNodeStatusSchema[]>()(this, 'geo_nodes/statuses', options);
