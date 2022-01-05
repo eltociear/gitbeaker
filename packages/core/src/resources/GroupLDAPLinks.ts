@@ -11,18 +11,14 @@ export class GroupLDAPLinks<C extends boolean = false> extends BaseResource<C> {
   add<E extends boolean = false>(
     groupId: string | number,
     groupAccess: number,
-    provider:string,
+    provider: string,
     options?: BaseRequestOptions<E>,
   ): Promise<GitlabAPIResponse<string, C, E, void>> {
-    return RequestHelper.post<string>()(
-      this,
-      endpoint`groups/${groupId}/ldap_group_links`,
-      {
-        groupAccess,
-        provider,
-        ...options,
-      }
-    );
+    return RequestHelper.post<string>()(this, endpoint`groups/${groupId}/ldap_group_links`, {
+      groupAccess,
+      provider,
+      ...options,
+    });
   }
 
   all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
@@ -38,16 +34,12 @@ export class GroupLDAPLinks<C extends boolean = false> extends BaseResource<C> {
 
   remove<E extends boolean = false>(
     groupId: string | number,
-    provider:string,
+    provider: string,
     options?: BaseRequestOptions<E>,
   ): Promise<GitlabAPIResponse<string, C, E, void>> {
-    return RequestHelper.del<string>()(
-      this,
-      endpoint`groups/${groupId}/ldap_group_links`,
-      {
-        provider,
-        ...options,
-      }
-    );
+    return RequestHelper.del<string>()(this, endpoint`groups/${groupId}/ldap_group_links`, {
+      provider,
+      ...options,
+    });
   }
 }
