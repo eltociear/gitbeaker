@@ -1,9 +1,9 @@
-import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
-import {
-  endpoint,
+import { BaseResource } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
@@ -28,12 +28,18 @@ export class ResourceBadges<C extends boolean = false> extends BaseResource<C> {
 
   add<E extends boolean = false>(
     resourceId: string | number,
+    linkUrl: string,
+    imageUrl: string,
     options?: BaseRequestOptions<E>,
   ): Promise<GitlabAPIResponse<BadgeSchema, C, E, void>> {
-    return RequestHelper.post<BadgeSchema>()(this, endpoint`${resourceId}/badges`, options);
+    return RequestHelper.post<BadgeSchema>()(this, endpoint`${resourceId}/badges`, {
+      linkUrl,
+      imageUrl,
+      ...options,
+    });
   }
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     resourceId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<BadgeSchema[], C, E, P>> {

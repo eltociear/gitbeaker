@@ -13,28 +13,32 @@ export interface GroupMembers<C extends boolean = false> extends ResourceMembers
     groupId: string | number,
     userId: number,
     accessLevel: AccessLevel,
-    options?: BaseRequestOptions,
+    options?: BaseRequestOptions<E>,
   ): Promise<CamelizedResponse<C, MemberSchema>>;
 
-  all(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     groupId: string | number,
     options?: IncludeInherited & PaginatedRequestOptions,
   ): Promise<CamelizedResponse<C, MemberSchema>[]>;
 
-  edit(
+  edit<E extends boolean = false>(
     groupId: string | number,
     userId: number,
     accessLevel: AccessLevel,
-    options?: BaseRequestOptions,
+    options?: BaseRequestOptions<E>,
   ): Promise<CamelizedResponse<C, MemberSchema>>;
 
-  show(
+  show<E extends boolean = false>(
     groupId: string | number,
     userId: number,
     options?: IncludeInherited & Sudo,
   ): Promise<CamelizedResponse<C, MemberSchema>>;
 
-  remove(groupId: string | number, userId: number, options?: Sudo): Promise<void>;
+  remove<E extends boolean = false>(
+    groupId: string | number,
+    userId: number,
+    options?: Sudo,
+  ): Promise<void>;
 }
 
 export class GroupMembers<C extends boolean = false> extends ResourceMembers<C> {

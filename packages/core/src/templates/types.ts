@@ -16,3 +16,4 @@ export type { TemplateSchema } from './ResourceTemplates';
 export type { VariableSchema } from './ResourceVariables';
 export type { WikiSchema } from './ResourceWikis';
 export type { HookSchema, ExpandedHookSchema } from './ResourceHooks';
+export type { PushRulesSchema } from './ResourcePushRules';

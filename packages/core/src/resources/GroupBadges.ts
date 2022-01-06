@@ -1,11 +1,11 @@
-import { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { ResourceBadges } from '../templates';
-import { BadgeSchema } from '../templates/types';
-import {
+import type { BadgeSchema } from '../templates/types';
+import type {
+  BaseRequestOptions,
+  PaginatedRequestOptions,
   Sudo,
   ShowExpanded,
-  PaginatedRequestOptions,
-  BaseRequestOptions,
   GitlabAPIResponse,
 } from '../infrastructure';
 
@@ -18,10 +18,12 @@ export type GroupBadgePreviewSchema = Omit<GroupBadgeSchema, 'id' | 'name' | 'ki
 export interface GroupBadges<C extends boolean = false> extends ResourceBadges<C> {
   add<E extends boolean = false>(
     groupId: string | number,
+    linkUrl: string,
+    imageUrl: string,
     options?: BaseRequestOptions<E>,
   ): Promise<GitlabAPIResponse<GroupBadgeSchema, C, E, void>>;
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     groupId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<GroupBadgeSchema[], C, E, P>>;

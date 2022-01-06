@@ -1,19 +1,8 @@
-import { BaseResource } from '@gitbeaker/requester-utils';
 import * as Mime from 'mime/lite';
-import {
-  endpoint, RequestHelper
-} from '../infrastructure';
-import type {
-  BaseRequestOptions,
-  Sudo,
-  ShowExpanded,
-  GitlabAPIResponse,
-} from '../infrastructure';
-
-interface UploadMetadata {
-  filename?: string;
-  contentType?: string;
-}
+import { BaseResource } from '@gitbeaker/requester-utils';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type { BaseRequestOptions, Sudo, ShowExpanded, GitlabAPIResponse } from '../infrastructure';
+import type { UploadMetadata } from './types';
 
 export const defaultMetadata = {
   filename: `${Date.now().toString()}.tar.gz`,

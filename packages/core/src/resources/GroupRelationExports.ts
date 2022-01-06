@@ -1,13 +1,6 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import * as Mime from 'mime/lite';
-import {
-  endpoint,
-  BaseRequestOptions,
-  RequestHelper,
-  Sudo,
-  ShowExpanded,
-  GitlabAPIResponse,
-} from '../infrastructure';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type { BaseRequestOptions, Sudo, ShowExpanded, GitlabAPIResponse } from '../infrastructure';
 
 export interface GroupRelationExportStatusSchema extends Record<string, unknown> {
   relation: string;

@@ -1,14 +1,14 @@
-import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
-import {
-  endpoint,
+import { BaseResource } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
-import { AccessLevel } from './ResourceAccessRequests';
+import type { AccessLevel } from './ResourceAccessRequests';
 
 export interface IncludeInherited {
   includeInherited?: boolean;
@@ -49,7 +49,7 @@ export class ResourceMembers<C extends boolean = false> extends BaseResource<C> 
     });
   }
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     resourceId: string | number,
     options: IncludeInherited & PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<MemberSchema[], C, E, P>> {
