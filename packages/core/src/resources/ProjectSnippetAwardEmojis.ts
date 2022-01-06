@@ -1,11 +1,16 @@
-import { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { ResourceAwardEmojis } from '../templates';
-import { AwardEmojiSchema } from '../templates/types';
-import { Sudo, PaginatedRequestOptions, GitlabAPIResponse, ShowExpanded } from '../infrastructure';
+import type { AwardEmojiSchema } from '../templates/types';
+import type {
+  PaginatedRequestOptions,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export interface ProjectSnippetAwardEmojis<C extends boolean = false>
   extends ResourceAwardEmojis<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     snippetId: number,
     options?: PaginatedRequestOptions<E, P>,
@@ -36,6 +41,6 @@ export interface ProjectSnippetAwardEmojis<C extends boolean = false>
 export class ProjectSnippetAwardEmojis<C extends boolean = false> extends ResourceAwardEmojis<C> {
   constructor(options: BaseResourceOptions<C>) {
     /* istanbul ignore next */
-    super('snippets', options);
+    super('projects', 'snippets', options);
   }
 }

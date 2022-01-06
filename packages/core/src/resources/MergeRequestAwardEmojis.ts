@@ -1,10 +1,15 @@
-import { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { ResourceAwardEmojis } from '../templates';
-import { AwardEmojiSchema } from '../templates/types';
-import { Sudo, PaginatedRequestOptions, GitlabAPIResponse, ShowExpanded } from '../infrastructure';
+import type { AwardEmojiSchema } from '../templates/types';
+import type {
+  PaginatedRequestOptions,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export interface MergeRequestAwardEmojis<C extends boolean = false> extends ResourceAwardEmojis<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     mergerequestIId: number,
     options?: PaginatedRequestOptions<E, P>,
@@ -35,6 +40,6 @@ export interface MergeRequestAwardEmojis<C extends boolean = false> extends Reso
 export class MergeRequestAwardEmojis<C extends boolean = false> extends ResourceAwardEmojis<C> {
   constructor(options: BaseResourceOptions<C>) {
     /* istanbul ignore next */
-    super('merge_requests', options);
+    super('projects', 'merge_requests', options);
   }
 }
