@@ -1,6 +1,6 @@
-import { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { ResourceTemplates } from '../templates';
-import { PaginatedRequestOptions, Sudo, CamelizedResponse } from '../infrastructure';
+import type { PaginatedRequestOptions, Sudo, GitlabAPIResponse } from '../infrastructure';
 
 export interface LicenseTemplateSchema extends Record<string, unknown> {
   key: string;
@@ -17,8 +17,14 @@ export interface LicenseTemplateSchema extends Record<string, unknown> {
 }
 
 export interface LicenseTemplates<C extends boolean = false> extends ResourceTemplates<C> {
-  all(options?: PaginatedRequestOptions): Promise<CamelizedResponse<C, LicenseTemplateSchema>[]>;
-  show(key: string | number, options?: Sudo): Promise<CamelizedResponse<C, LicenseTemplateSchema>>;
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<LicenseTemplateSchema[], C, E, P>>;
+
+  show<E extends boolean = false>(
+    key: string | number,
+    options?: Sudo,
+  ): Promise<GitlabAPIResponse<LicenseTemplateSchema, C, E, void>>;
 }
 
 export class LicenseTemplates<C extends boolean = false> extends ResourceTemplates<C> {

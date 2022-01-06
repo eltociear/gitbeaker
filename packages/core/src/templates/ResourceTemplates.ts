@@ -1,7 +1,8 @@
-import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
-import {
+import { BaseResource } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import { RequestHelper } from '../infrastructure';
+import type {
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
@@ -17,7 +18,7 @@ export class ResourceTemplates<C extends boolean = false> extends BaseResource<C
     super({ prefixUrl: ['templates', resourceType].join('/'), ...options });
   }
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<TemplateSchema[], C, E, P>> {
     return RequestHelper.get<TemplateSchema[]>()(this, '', options);
