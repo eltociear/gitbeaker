@@ -1,8 +1,7 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  endpoint,
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
@@ -42,7 +41,7 @@ export type CondensedRegistryRepositorySchema = Omit<
 >;
 
 export class ContainerRegistry<C extends boolean = false> extends BaseResource<C> {
-  projectRepositories<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  projectRepositories<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<CondensedRegistryRepositorySchema[], C, E, P>> {
@@ -53,7 +52,7 @@ export class ContainerRegistry<C extends boolean = false> extends BaseResource<C
     );
   }
 
-  groupRepositories<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  groupRepositories<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<CondensedRegistryRepositorySchema[], C, E, P>> {
@@ -76,7 +75,7 @@ export class ContainerRegistry<C extends boolean = false> extends BaseResource<C
     );
   }
 
-  tags<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  tags<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     repositoryId: number,
     options?: PaginatedRequestOptions<E, P>,
