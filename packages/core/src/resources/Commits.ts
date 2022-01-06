@@ -1,16 +1,15 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { UserSchema } from './Users';
-import { MergeRequestSchema } from './MergeRequests';
-import { DiscussionNoteSchema } from '../templates/ResourceDiscussions';
-import {
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
-  endpoint,
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
+import type { UserSchema } from './Users';
+import type { MergeRequestSchema } from './MergeRequests';
+import type { DiscussionNoteSchema } from '../templates/ResourceDiscussions';
 
 export interface CommitAction {
   /** The action to perform */
@@ -46,7 +45,7 @@ export interface CommitSchema extends Record<string, unknown> {
   web_url: string;
 }
 
-export interface CommitExtendedSchema extends CommitSchema {
+export interface CommitExpandedSchema extends CommitSchema {
   last_pipeline: {
     id: number;
     ref: string;
@@ -152,7 +151,7 @@ export interface CommitDiscussionSchema extends Record<string, unknown> {
 }
 
 export class Commits<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<CommitSchema[], C, E, P>> {
@@ -179,7 +178,7 @@ export class Commits<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  comments<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  comments<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     sha: string,
     options?: PaginatedRequestOptions<E, P>,
@@ -197,8 +196,8 @@ export class Commits<C extends boolean = false> extends BaseResource<C> {
     message: string,
     actions: CommitAction[] = [],
     options: BaseRequestOptions<E> = {},
-  ): Promise<GitlabAPIResponse<CommitExtendedSchema, C, E, void>> {
-    return RequestHelper.post<CommitExtendedSchema>()(
+  ): Promise<GitlabAPIResponse<CommitExpandedSchema, C, E, void>> {
+    return RequestHelper.post<CommitExpandedSchema>()(
       this,
       endpoint`projects/${projectId}/repository/commits`,
       {
@@ -226,7 +225,7 @@ export class Commits<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  diff<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  diff<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     sha: string,
     options?: PaginatedRequestOptions<E, P>,
@@ -238,7 +237,7 @@ export class Commits<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  discussions<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  discussions<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     sha: string,
     options?: PaginatedRequestOptions<E, P>,
@@ -262,7 +261,7 @@ export class Commits<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  references<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  references<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     sha: string,
     options?: PaginatedRequestOptions<E, P>,
@@ -290,8 +289,8 @@ export class Commits<C extends boolean = false> extends BaseResource<C> {
     projectId: string | number,
     sha: string,
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<CommitExtendedSchema, C, E, void>> {
-    return RequestHelper.get<CommitExtendedSchema>()(
+  ): Promise<GitlabAPIResponse<CommitExpandedSchema, C, E, void>> {
+    return RequestHelper.get<CommitExpandedSchema>()(
       this,
       endpoint`projects/${projectId}/repository/commits/${sha}`,
       options,
