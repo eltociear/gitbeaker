@@ -1,11 +1,16 @@
-import { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { ResourceAccessRequests } from '../templates';
-import { AccessRequestSchema, AccessLevel } from '../templates/types';
-import { Sudo, ShowExpanded, PaginatedRequestOptions, GitlabAPIResponse } from '../infrastructure';
+import type { AccessRequestSchema, AccessLevel } from '../templates/types';
+import type {
+  PaginatedRequestOptions,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export interface ProjectAccessRequests<C extends boolean = false>
   extends ResourceAccessRequests<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<AccessRequestSchema[], C, E, P>>;
