@@ -1,29 +1,38 @@
-import { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { ResourceCustomAttributes } from '../templates';
-import { CustomAttributeSchema } from '../templates/types';
-import { PaginatedRequestOptions, CamelizedResponse, Sudo } from '../infrastructure';
+import type { CustomAttributeSchema } from '../templates/types';
+import type {
+  PaginatedRequestOptions,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export interface ProjectCustomAttributes<C extends boolean = false>
   extends ResourceCustomAttributes<C> {
-  all(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
-    options?: PaginatedRequestOptions,
-  ): Promise<CamelizedResponse<C, CustomAttributeSchema>[]>;
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<CustomAttributeSchema[], C, E, P>>;
 
-  set(
+  set<E extends boolean = false>(
     projectId: string | number,
     customAttributeId: number,
     value: string,
-    options?: Sudo,
-  ): Promise<CamelizedResponse<C, CustomAttributeSchema>>;
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<CustomAttributeSchema, C, E, void>>;
 
-  remove(projectId: string | number, customAttributeId: number, options?: Sudo): Promise<void>;
-
-  show(
+  remove<E extends boolean = false>(
     projectId: string | number,
     customAttributeId: number,
     options?: Sudo,
-  ): Promise<CamelizedResponse<C, CustomAttributeSchema>>;
+  ): Promise<GitlabAPIResponse<void, C, E, void>>;
+
+  show<E extends boolean = false>(
+    projectId: string | number,
+    customAttributeId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<CustomAttributeSchema, C, E, void>>;
 }
 
 export class ProjectCustomAttributes<C extends boolean> extends ResourceCustomAttributes<C> {
