@@ -1,7 +1,7 @@
-import { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { ResourceDiscussions } from '../templates';
-import { DiscussionSchema, DiscussionNoteSchema } from '../templates/types';
-import {
+import type { DiscussionSchema, DiscussionNoteSchema } from '../templates/types';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
   Sudo,
@@ -19,7 +19,7 @@ export interface EpicDiscussions<C extends boolean = false> extends ResourceDisc
     options?: BaseRequestOptions<E>,
   ): Promise<GitlabAPIResponse<DiscussionNoteSchema, C, E, void>>;
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     groupId: string | number,
     epicId: number,
     options?: PaginatedRequestOptions<E, P>,

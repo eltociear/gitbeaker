@@ -5,6 +5,7 @@ export type { CustomAttributeSchema } from './ResourceCustomAttributes';
 export type {
   DiscussionSchema,
   DiscussionNoteSchema,
+  DiscussionNotePositionSchema,
   DiscussionNotePositionBaseOptions,
 } from './ResourceDiscussions';
 export type { IssueBoardListSchema, IssueBoardSchema } from './ResourceIssueBoards';

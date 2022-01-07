@@ -1,14 +1,14 @@
-import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
-import { UserSchema } from '../resources/Users';
-import {
-  endpoint,
+import { BaseResource } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
+import type { UserSchema } from '../resources/Users';
 
 export interface DiscussionNotePositionBaseOptions {
   base_sha: string;
@@ -49,8 +49,7 @@ export interface DiscussionNoteSchema extends Record<string, unknown> {
   noteable_id: number;
   noteable_type: string;
   noteable_iid?: number;
-  resolvable: boolean;
-  position?: DiscussionNotePositionSchema;
+  resolvable?: boolean;
 }
 
 export interface DiscussionSchema extends Record<string, unknown> {
@@ -83,7 +82,7 @@ export class ResourceDiscussions<C extends boolean = false> extends BaseResource
     );
   }
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     resourceId: string | number,
     resource2Id: string | number,
     options?: PaginatedRequestOptions<E, P>,

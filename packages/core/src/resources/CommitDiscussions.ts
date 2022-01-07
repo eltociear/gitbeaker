@@ -47,7 +47,7 @@ export interface CommitDiscussions<C extends boolean = false> extends ResourceDi
     commitId: number,
     discussionId: number,
     noteId: number,
-    options: BaseRequestOptions<E> & { body: string },
+    options?: BaseRequestOptions<E> & { body?: string },
   ): Promise<GitlabAPIResponse<DiscussionNoteSchema, C, E, void>>;
 
   removeNote<E extends boolean = false>(
