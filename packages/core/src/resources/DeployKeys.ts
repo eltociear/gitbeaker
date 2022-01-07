@@ -1,9 +1,8 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
-  endpoint,
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
@@ -35,7 +34,7 @@ export interface ExpandedDeployKeySchema extends CondensedDeployKeySchema {
 }
 
 export class DeployKeys<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     {
       projectId,
       ...options
