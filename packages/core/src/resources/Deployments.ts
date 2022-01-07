@@ -1,22 +1,21 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { CommitSchema } from './Commits';
-import { PipelineSchema } from './Pipelines';
-import { UserSchema } from './Users';
-import { RunnerSchema } from './Runners';
-import { EnvironmentSchema } from './Environments';
-import { MergeRequestSchema } from './MergeRequests';
-import {
-  endpoint,
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
+import type { CommitSchema } from './Commits';
+import type { PipelineSchema } from './Pipelines';
+import type { UserSchema } from './Users';
+import type { RunnerSchema } from './Runners';
+import type { EnvironmentSchema } from './Environments';
+import type { MergeRequestSchema } from './MergeRequests';
 
 export type DeploymentStatus = 'created' | 'running' | 'success' | 'failed' | 'canceled';
 
-export interface DeployableSchema {
+export interface DeployableSchema extends Record<string, unknown> {
   id: number;
   ref: string;
   name: string;
@@ -33,21 +32,26 @@ export interface DeployableSchema {
   pipeline?: PipelineSchema;
 }
 
-export type DeploymentSchema = {
+export interface DeploymentStatusSchema extends Record<string, unknown> {
+  user: UserSchema;
+  status: 'approved' | 'rejected';
+}
+
+export interface DeploymentSchema extends Record<string, unknown> {
   id: number;
   iid: number;
   ref: string;
   sha: string;
-  user: UserSchema;
   created_at: string;
   updated_at: string;
   status: DeploymentStatus;
+  user: UserSchema;
   deployable: DeployableSchema;
   environment: EnvironmentSchema;
-};
+}
 
 export class Deployments<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<DeploymentSchema[], C, E, P>> {
@@ -91,6 +95,18 @@ export class Deployments<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
+  setApproval<E extends boolean = false>(
+    projectId: string | number,
+    deploymentId: number,
+    options?: { status?: 'approved' | 'rejected' } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<DeploymentStatusSchema, C, E, void>> {
+    return RequestHelper.post<DeploymentStatusSchema>()(
+      this,
+      endpoint`projects/${projectId}/deployments/${deploymentId}/approval`,
+      options,
+    );
+  }
+
   show<E extends boolean = false>(
     projectId: string | number,
     deploymentId: number,
@@ -103,7 +119,7 @@ export class Deployments<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  mergeRequests<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  mergeRequests<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     deploymentId: number,
     options?: PaginatedRequestOptions<E, P>,
