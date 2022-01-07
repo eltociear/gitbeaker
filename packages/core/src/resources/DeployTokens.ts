@@ -1,8 +1,7 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  endpoint,
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
@@ -26,7 +25,7 @@ export interface DeployTokenSchema extends Record<string, unknown> {
 }
 
 export class DeployTokens<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     {
       projectId,
       groupId,
