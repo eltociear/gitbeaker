@@ -10,7 +10,7 @@ export interface ErrorTrackingSettingsSchema extends Record<string, unknown> {
   integrated: boolean;
 }
 
-export class ApplicationSettings<C extends boolean = false> extends BaseResource<C> {
+export class ErrorTrackingSettings<C extends boolean = false> extends BaseResource<C> {
   show<E extends boolean = false>(
     projectId: string | number,
     options?: Sudo & ShowExpanded<E>,

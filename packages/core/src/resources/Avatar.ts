@@ -6,7 +6,7 @@ export interface AvatarSchema extends Record<string, unknown> {
   avatar_url: string;
 }
 
-export class Avatars<C extends boolean = false> extends BaseResource<C> {
+export class Avatar<C extends boolean = false> extends BaseResource<C> {
   show<E extends boolean = false>(
     email: string,
     options?: BaseRequestOptions<E>,
