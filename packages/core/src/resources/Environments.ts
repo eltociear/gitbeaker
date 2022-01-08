@@ -1,14 +1,13 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { DeploymentSchema, DeployableSchema } from './Deployments';
-import {
-  endpoint,
-  RequestHelper,
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
+import type { DeploymentSchema, DeployableSchema } from './Deployments';
 
 export interface EnvironmentSchema extends Record<string, unknown> {
   id: number;
@@ -16,6 +15,8 @@ export interface EnvironmentSchema extends Record<string, unknown> {
   slug: string;
   external_url: string;
   state: string;
+  created_at: string;
+  updated_at: string;
   last_deployment: DeploymentSchema;
   deployable: DeployableSchema;
 }
@@ -25,25 +26,13 @@ export type CondensedEnviromentSchema = Omit<EnvironmentSchema, 'last_deployment
 export type ReviewAppSchema = Omit<CondensedEnviromentSchema, 'state'>;
 
 export class Environments<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<CondensedEnviromentSchema[], C, E, P>> {
     return RequestHelper.get<CondensedEnviromentSchema[]>()(
       this,
       endpoint`projects/${projectId}/environments`,
-      options,
-    );
-  }
-
-  show<E extends boolean = false>(
-    projectId: string | number,
-    environmentId: number,
-    options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<CondensedEnviromentSchema, C, E, void>> {
-    return RequestHelper.get<CondensedEnviromentSchema>()(
-      this,
-      endpoint`projects/${projectId}/environments/${environmentId}`,
       options,
     );
   }
@@ -102,6 +91,18 @@ export class Environments<C extends boolean = false> extends BaseResource<C> {
       scheduled_entries: ReviewAppSchema[];
       unprocessable_entries: ReviewAppSchema[];
     }>()(this, endpoint`projects/${projectId}/environments/review_apps`, options);
+  }
+
+  show<E extends boolean = false>(
+    projectId: string | number,
+    environmentId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<CondensedEnviromentSchema, C, E, void>> {
+    return RequestHelper.get<CondensedEnviromentSchema>()(
+      this,
+      endpoint`projects/${projectId}/environments/${environmentId}`,
+      options,
+    );
   }
 
   stop<E extends boolean = false>(
