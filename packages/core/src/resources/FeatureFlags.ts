@@ -1,11 +1,10 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  endpoint,
-  RequestHelper,
-  Sudo,
-  ShowExpanded,
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
+  Sudo,
+  ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
 
@@ -34,7 +33,7 @@ export interface FeatureFlagSchema extends Record<string, unknown> {
 }
 
 export class FeatureFlags<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options: { scopes?: 'enabled' | 'disabled' } & PaginatedRequestOptions<E, P> = {} as any,
   ): Promise<GitlabAPIResponse<FeatureFlagSchema[], C, E, P>> {

@@ -1,11 +1,10 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  endpoint,
-  RequestHelper,
-  Sudo,
-  ShowExpanded,
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
+  Sudo,
+  ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
 
@@ -20,7 +19,7 @@ export interface FeatureFlagUserListSchema extends Record<string, unknown> {
 }
 
 export class FeatureFlags<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options: { scopes?: 'enabled' | 'disabled' } & PaginatedRequestOptions<E, P> = {} as any,
   ): Promise<GitlabAPIResponse<FeatureFlagUserListSchema[], C, E, P>> {
@@ -50,36 +49,36 @@ export class FeatureFlags<C extends boolean = false> extends BaseResource<C> {
 
   edit<E extends boolean = false>(
     projectId: string | number,
-    featureFlagUserListId: string,
+    featureFlagUserListIId: string,
     options?: { name?: string; userXIds?: string } & BaseRequestOptions<E>,
   ): Promise<GitlabAPIResponse<FeatureFlagUserListSchema, C, E, void>> {
     return RequestHelper.put<FeatureFlagUserListSchema>()(
       this,
-      endpoint`projects/${projectId}/feature_flags_user_lists/${featureFlagUserListId}`,
+      endpoint`projects/${projectId}/feature_flags_user_lists/${featureFlagUserListIId}`,
       options,
     );
   }
 
   remove<E extends boolean = false>(
     projectId: string | number,
-    featureFlagUserListId: string,
+    featureFlagUserListIId: string,
     options?: Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
-      endpoint`projects/${projectId}/feature_flags_user_lists/${featureFlagUserListId}`,
+      endpoint`projects/${projectId}/feature_flags_user_lists/${featureFlagUserListIId}`,
       options,
     );
   }
 
   show<E extends boolean = false>(
     projectId: string | number,
-    featureFlagUserListId: string,
+    featureFlagUserListIId: string,
     options?: Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<FeatureFlagUserListSchema, C, E, void>> {
     return RequestHelper.get<FeatureFlagUserListSchema>()(
       this,
-      endpoint`projects/${projectId}/feature_flags_user_lists/${featureFlagUserListId}`,
+      endpoint`projects/${projectId}/feature_flags_user_lists/${featureFlagUserListIId}`,
       options,
     );
   }
