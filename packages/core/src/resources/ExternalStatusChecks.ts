@@ -1,11 +1,10 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  endpoint,
-  RequestHelper,
-  Sudo,
-  ShowExpanded,
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
+  Sudo,
+  ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
 
@@ -33,17 +32,17 @@ export interface ProjectExternalStatusCheckSchema extends BaseExternalStatusChec
 }
 
 export class ExternalStatusChecks<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options: { mergerequestIId: number } & PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<MergeRequestExternalStatusCheckSchema[], C, E, P>>;
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<ProjectExternalStatusCheckSchema[], C, E, P>>;
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     {
       mergerequestIId,
