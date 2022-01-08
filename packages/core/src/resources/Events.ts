@@ -1,11 +1,7 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type { PaginatedRequestOptions, GitlabAPIResponse } from '../infrastructure';
 import { UserSchema } from './Users';
-import {
-  endpoint,
-  RequestHelper,
-  PaginatedRequestOptions,
-  GitlabAPIResponse,
-} from '../infrastructure';
 
 export interface EventOptions {
   action?:
@@ -42,7 +38,7 @@ export interface EventSchema extends Record<string, unknown> {
 }
 
 export class Events<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     {
       projectId,
       userId,
