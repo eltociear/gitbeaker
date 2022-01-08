@@ -1,9 +1,6 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { RequestHelper } from '../infrastructure';
-import type {
-  BaseRequestOptions,
-  GitlabAPIResponse,
-} from '../infrastructure';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type { BaseRequestOptions, GitlabAPIResponse } from '../infrastructure';
 
 export interface GoProxyModuleVersionSchema extends Record<string, unknown> {
   Version: string;
@@ -18,7 +15,7 @@ export class GeoNodes<C extends boolean = false> extends BaseResource<C> {
   ): Promise<GitlabAPIResponse<string, C, E, void>> {
     return RequestHelper.get<string>()(
       this,
-      `projects/${projectId}/packages/go/${moduleName}/@v/list`,
+      endpoint`projects/${projectId}/packages/go/${moduleName}/@v/list`,
       options,
     );
   }
@@ -31,7 +28,7 @@ export class GeoNodes<C extends boolean = false> extends BaseResource<C> {
   ): Promise<GitlabAPIResponse<GoProxyModuleVersionSchema, C, E, void>> {
     return RequestHelper.get<GoProxyModuleVersionSchema>()(
       this,
-      `projects/${projectId}/packages/go/${moduleName}/@v/${moduleVersion}.info`,
+      endpoint`projects/${projectId}/packages/go/${moduleName}/@v/${moduleVersion}.info`,
       options,
     );
   }
@@ -44,7 +41,7 @@ export class GeoNodes<C extends boolean = false> extends BaseResource<C> {
   ): Promise<GitlabAPIResponse<string, C, E, void>> {
     return RequestHelper.get<string>()(
       this,
-      `projects/${projectId}/packages/go/${moduleName}/@v/${moduleVersion}.mod`,
+      endpoint`projects/${projectId}/packages/go/${moduleName}/@v/${moduleVersion}.mod`,
       options,
     );
   }
@@ -57,7 +54,7 @@ export class GeoNodes<C extends boolean = false> extends BaseResource<C> {
   ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
-      `projects/${projectId}/packages/go/${moduleName}/@v/${moduleVersion}.zip`,
+      endpoint`projects/${projectId}/packages/go/${moduleName}/@v/${moduleVersion}.zip`,
       options,
     );
   }

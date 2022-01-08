@@ -1,10 +1,10 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  Sudo,
-  ShowExpanded,
-  RequestHelper,
+import { RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
+  Sudo,
+  ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
 
