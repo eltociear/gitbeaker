@@ -1,11 +1,10 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  endpoint,
-  RequestHelper,
-  Sudo,
-  GitlabAPIResponse,
-  ShowExpanded,
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   PaginatedRequestOptions,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
 } from '../infrastructure';
 
 export interface ErrorTrackingClientKeySchema extends Record<string, unknown> {
@@ -16,7 +15,7 @@ export interface ErrorTrackingClientKeySchema extends Record<string, unknown> {
 }
 
 export class ApplicationSettings<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<ErrorTrackingClientKeySchema[], C, E, P>> {

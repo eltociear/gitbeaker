@@ -1,12 +1,6 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  endpoint,
-  RequestHelper,
-  Sudo,
-  BaseRequestOptions,
-  GitlabAPIResponse,
-  ShowExpanded,
-} from '../infrastructure';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type { BaseRequestOptions, Sudo, ShowExpanded, GitlabAPIResponse } from '../infrastructure';
 
 export interface ErrorTrackingSettingsSchema extends Record<string, unknown> {
   active: boolean;
