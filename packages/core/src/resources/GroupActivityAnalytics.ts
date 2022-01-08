@@ -1,5 +1,10 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { RequestHelper, Sudo, ShowExpanded, GitlabAPIResponse } from '../infrastructure';
+import { RequestHelper } from '../infrastructure';
+import type {
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export interface GroupAnalyticsIssuesCountSchema extends Record<string, unknown> {
   issues_count: number;

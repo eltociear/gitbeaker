@@ -26,7 +26,7 @@ export class GroupImportExports<C extends boolean = false> extends BaseResource<
       parentId,
       ...options
     }: { parentId?: number; metadata?: UploadMetadata } & Sudo & ShowExpanded<E> = {},
-  ): Promise<GitlabAPIResponse<void, C, E, void>> {
+  ): Promise<GitlabAPIResponse<unknown, C, E, void>> {
     const meta = { ...defaultMetadata, ...metadata };
 
     if (!meta.contentType) meta.contentType = Mime.getType(meta.filename) || undefined;
