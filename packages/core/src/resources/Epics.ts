@@ -1,21 +1,21 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { UserSchema } from './Users';
-import { GroupSchema } from './Groups';
-import {
-  endpoint,
-  RequestHelper,
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
+import { UserSchema } from './Users';
+import { GroupSchema } from './Groups';
 
 export interface EpicSchema extends Record<string, unknown> {
   id: number;
   iid: number;
   group_id: number;
   parent_id: number;
+  parent_iid: number;
   title: string;
   description: string;
   state: string;
@@ -62,7 +62,7 @@ export interface EpicTodoSchema extends Record<string, unknown> {
 }
 
 export class Epics<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     groupId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<EpicSchema[], C, E, P>> {
@@ -96,8 +96,8 @@ export class Epics<C extends boolean = false> extends BaseResource<C> {
     groupId: string | number,
     epicIId: number,
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<EpicSchema, C, E, void>> {
-    return RequestHelper.put<EpicSchema>()(
+  ): Promise<GitlabAPIResponse<Omit<EpicSchema, '_links'>, C, E, void>> {
+    return RequestHelper.put<Omit<EpicSchema, '_links'>>()(
       this,
       endpoint`groups/${groupId}/epics/${epicIId}`,
       options,

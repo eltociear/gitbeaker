@@ -1,22 +1,26 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { IssueSchema } from './Issues';
-import {
-  endpoint,
-  RequestHelper,
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
+import type { IssueSchema } from './Issues';
 
 export interface EpicIssueSchema
   extends Omit<IssueSchema, 'references' | 'task_completion_status'> {
   epic_issue_id: number;
 }
 
+export interface ExpandedEpicIssueSchema extends EpicIssueSchema {
+  subscribed: boolean;
+  relative_position: number;
+}
+
 export class EpicIssues<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     groupId: string | number,
     epicIId: number,
     options?: PaginatedRequestOptions<E, P>,
@@ -46,8 +50,8 @@ export class EpicIssues<C extends boolean = false> extends BaseResource<C> {
     epicIId: number,
     epicIssueId: number,
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<EpicIssueSchema, C, E, void>> {
-    return RequestHelper.put<EpicIssueSchema>()(
+  ): Promise<GitlabAPIResponse<ExpandedEpicIssueSchema, C, E, void>> {
+    return RequestHelper.put<ExpandedEpicIssueSchema>()(
       this,
       endpoint`groups/${groupId}/epics/${epicIId}/issues/${epicIssueId}`,
       options,
