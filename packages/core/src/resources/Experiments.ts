@@ -1,5 +1,6 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { RequestHelper, PaginatedRequestOptions, GitlabAPIResponse } from '../infrastructure';
+import { RequestHelper } from '../infrastructure';
+import type { PaginatedRequestOptions, GitlabAPIResponse } from '../infrastructure';
 
 export interface ExperimentGateSchema {
   key: string;
@@ -24,7 +25,7 @@ export interface ExperimentSchema extends Record<string, unknown> {
 }
 
 export class Experiments<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<ExperimentSchema[], C, E, P>> {
     return RequestHelper.get<ExperimentSchema[]>()(this, 'experiments', options);
