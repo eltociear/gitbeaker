@@ -31,7 +31,7 @@ export class GroupImportExports<C extends boolean = false> extends BaseResource<
 
     if (!meta.contentType) meta.contentType = Mime.getType(meta.filename) || undefined;
 
-    return RequestHelper.post<void>()(this, 'groups/import', {
+    return RequestHelper.post<unknown>()(this, 'groups/import', {
       isForm: true,
       ...options,
       file: [content, meta],

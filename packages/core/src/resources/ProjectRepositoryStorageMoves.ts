@@ -10,7 +10,7 @@ import type {
 import type { SimpleProjectSchema } from './Projects';
 
 export interface ProjectRepositoryStorageMoveSchema extends RepositoryStorageMoveSchema {
-  project: SimpleProjectSchema
+  project: SimpleProjectSchema;
 }
 
 export interface ProjectRepositoryStorageMoves<C extends boolean = false>

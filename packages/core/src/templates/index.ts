@@ -15,3 +15,5 @@ export { ResourceVariables } from './ResourceVariables';
 export { ResourceWikis } from './ResourceWikis';
 export { ResourceHooks } from './ResourceHooks';
 export { ResourcePushRules } from './ResourcePushRules';
+export { ResourceRepositoryStorageMoves } from './ResourceRepositoryStorageMoves';
+export { ResourceInvitations } from './ResourceInvitations';

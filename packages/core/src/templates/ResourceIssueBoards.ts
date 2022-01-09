@@ -1,15 +1,15 @@
-import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
-import { MilestoneSchema } from './ResourceMilestones';
-import { LabelSchema } from './ResourceLabels';
-import {
-  endpoint,
+import { BaseResource } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
+import { MilestoneSchema } from './ResourceMilestones';
+import { LabelSchema } from './ResourceLabels';
 
 export interface IssueBoardListSchema extends Record<string, unknown> {
   id: number;
@@ -32,7 +32,7 @@ export class ResourceIssueBoards<C extends boolean = false> extends BaseResource
     super({ prefixUrl: resourceType, ...options });
   }
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     resourceId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<IssueBoardSchema[], C, E, P>> {
@@ -53,14 +53,12 @@ export class ResourceIssueBoards<C extends boolean = false> extends BaseResource
   createList<E extends boolean = false>(
     resourceId: string | number,
     boardId: number,
-    labelId: number | string,
     options?: Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<IssueBoardListSchema, C, E, void>> {
     return RequestHelper.post<IssueBoardListSchema>()(
       this,
       endpoint`${resourceId}/boards/${boardId}/lists`,
       {
-        labelId,
         ...options,
       },
     );
