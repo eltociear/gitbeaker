@@ -88,15 +88,15 @@ function globalConfig(env = process.env): { [name: string]: Sywac.Options } {
 const ignoreOptions = ['_', '$0', 'v', 'version', 'h', 'help', 'g', 'global-args'];
 
 // Helper function to param case strings
-function param(string: string): string {
-  let cleaned = string;
+function param(value: string): string {
+  let cleaned = value;
 
   // Handle exceptions
-  const exceptions = ['GitLabCI', 'YML', 'GPG', 'SSH'];
+  const exceptions = ['GitLabCI', 'YML', 'GPG', 'SSH', 'IId'];
 
-  const ex = exceptions.find((e) => string.includes(e));
+  const ex = exceptions.find((e) => value.includes(e));
 
-  if (ex) cleaned = cleaned.replace(ex, ex.charAt(0).toUpperCase() + ex.slice(1));
+  if (ex) cleaned = cleaned.replace(ex, ex.charAt(0).toUpperCase() + ex.slice(1).toLowerCase());
 
   // Decamelize
   const decamelized = decamelize(cleaned, '-');

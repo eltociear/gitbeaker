@@ -4,10 +4,6 @@ import { endpoint, RequestHelper } from '../infrastructure';
 import type { BaseRequestOptions, Sudo, ShowExpanded, GitlabAPIResponse } from '../infrastructure';
 import type { UploadMetadata } from './types';
 
-export const defaultMetadata = {
-  filename: `${Date.now().toString()}.tar.gz`,
-};
-
 export class GroupImportExports<C extends boolean = false> extends BaseResource<C> {
   download<E extends boolean = false>(
     groupId: string | number,
@@ -27,7 +23,10 @@ export class GroupImportExports<C extends boolean = false> extends BaseResource<
       ...options
     }: { parentId?: number; metadata?: UploadMetadata } & Sudo & ShowExpanded<E> = {},
   ): Promise<GitlabAPIResponse<unknown, C, E, void>> {
-    const meta = { ...defaultMetadata, ...metadata };
+    const meta = {
+      filename: `${Date.now().toString()}.tar.gz`,
+      ...metadata,
+    };
 
     if (!meta.contentType) meta.contentType = Mime.getType(meta.filename) || undefined;
 

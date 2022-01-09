@@ -1,14 +1,32 @@
+import * as Mime from 'mime/lite';
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { UserSchema } from './Users';
-import { MergeRequestSchema } from './MergeRequests';
-import { MilestoneSchema } from '../templates/types';
-import {
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
-  endpoint,
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
 } from '../infrastructure';
+import type { UserSchema } from './Users';
+import type { MergeRequestSchema } from './MergeRequests';
+import type { TodoSchema } from './Todos';
+import type { MilestoneSchema } from '../templates/types';
+import type { UploadMetadata } from './types';
+
+export interface MetricImageSchema extends Record<string, unknown> {
+  id: number;
+  created_at: string;
+  filename: string;
+  file_path: string;
+  url: string;
+}
+
+export interface UserAgentDetailSchema extends Record<string, unknown> {
+  user_agent: string;
+  ip_address: string;
+  akismet_submitted: boolean;
+}
 
 export interface TimeStatsSchema extends Record<string, unknown> {
   time_estimate: number;
@@ -43,12 +61,13 @@ export interface IssueLinkSchema extends Record<string, unknown> {
 export interface IssueSchema extends Record<string, unknown> {
   state: string;
   description: string;
-  weight?: number;
   health_status?: string;
+  weight?: number;
   author: Omit<UserSchema, 'created_at'>;
   milestone: MilestoneSchema;
   project_id: number;
   assignees?: Omit<UserSchema, 'created_at'>[];
+  type: string;
   updated_at: string;
   closed_at?: string;
   closed_by?: string;
@@ -95,10 +114,15 @@ export interface IssueSchema extends Record<string, unknown> {
 }
 
 export class Issues<C extends boolean = false> extends BaseResource<C> {
-  addSpentTime(projectId: string | number, issueIid: number, duration: string, options?: Sudo) {
+  addSpentTime<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    duration: string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<TimeStatsSchema, C, E, void>> {
     return RequestHelper.post<TimeStatsSchema>()(
       this,
-      endpoint`projects/${projectId}/issues/${issueIid}/add_spent_time`,
+      endpoint`projects/${projectId}/issues/${issueIId}/add_spent_time`,
       {
         duration,
         ...options,
@@ -106,10 +130,15 @@ export class Issues<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  addTimeEstimate(projectId: string | number, issueIid: number, duration: string, options?: Sudo) {
+  addTimeEstimate<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    duration: string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<TimeStatsSchema, C, E, void>> {
     return RequestHelper.post<TimeStatsSchema>()(
       this,
-      endpoint`projects/${projectId}/issues/${issueIid}/time_estimate`,
+      endpoint`projects/${projectId}/issues/${issueIId}/time_estimate`,
       {
         duration,
         ...options,
@@ -117,11 +146,17 @@ export class Issues<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  all({
-    projectId,
-    groupId,
-    ...options
-  }: { projectId?: string | number; groupId?: string | number } & PaginatedRequestOptions = {}) {
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
+    {
+      projectId,
+      groupId,
+      ...options
+    }: (
+      | { projectId?: string | number; groupId?: never }
+      | { groupId?: string | number; projectId?: never }
+    ) &
+      PaginatedRequestOptions<E, P> = {} as any,
+  ): Promise<GitlabAPIResponse<IssueSchema[], C, E, P>> {
     let url: string;
 
     if (projectId) {
@@ -132,138 +167,279 @@ export class Issues<C extends boolean = false> extends BaseResource<C> {
       url = 'issues';
     }
 
-    return RequestHelper.get<Omit<IssueSchema, 'epic'>[]>()(this, url, options);
+    return RequestHelper.get<IssueSchema[]>()(this, url, options as PaginatedRequestOptions<E, P>);
   }
 
-  create(projectId: string | number, options?: BaseRequestOptions) {
+  create<E extends boolean = false>(
+    projectId: string | number,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<IssueSchema, C, E, void>> {
     return RequestHelper.post<IssueSchema>()(this, endpoint`projects/${projectId}/issues`, options);
   }
 
-  closedBy(projectId: string | number, issueIid: number, options?: BaseRequestOptions) {
-    return RequestHelper.get<MergeRequestSchema[]>()(
-      this,
-      endpoint`projects/${projectId}/issues/${issueIid}/closed_by`,
-      options,
-    );
-  }
-
-  edit(projectId: string | number, issueIid: number, options?: BaseRequestOptions) {
-    return RequestHelper.put<IssueSchema>()(
-      this,
-      endpoint`projects/${projectId}/issues/${issueIid}`,
-      options,
-    );
-  }
-
-  // TODO move
-  link(
+  createTodo<E extends boolean = false>(
     projectId: string | number,
     issueIId: number,
-    targetProjectId: string | number,
-    targetIssueIId: number,
-    options?: BaseRequestOptions,
-  ) {
-    const [targetPId, targetIId] = [targetProjectId, targetIssueIId].map(encodeURIComponent);
-
-    return RequestHelper.post<IssueLinkSchema>()(
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<TodoSchema, C, E, void>> {
+    return RequestHelper.post<TodoSchema>()(
       this,
-      endpoint`projects/${projectId}/issues/${issueIId}/links`,
+      endpoint`projects/${projectId}/issues/${issueIId}/todo`,
+      options,
+    );
+  }
+
+  clone<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    destinationProjectId: string | number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<IssueSchema, C, E, void>> {
+    return RequestHelper.post<IssueSchema>()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/clone`,
       {
-        targetProjectId: targetPId,
-        targetIssueIid: targetIId,
+        toProjectId: destinationProjectId,
         ...options,
       },
     );
   }
 
-  // TODO move
-  links(projectId: string | number, issueIid: number) {
-    return RequestHelper.get<IssueLinkSchema[]>()(
+  closedByMergeRequestst<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<MergeRequestSchema[], C, E, void>> {
+    return RequestHelper.get<MergeRequestSchema[]>()(
       this,
-      endpoint`projects/${projectId}/issues/${issueIid}/links`,
+      endpoint`projects/${projectId}/issues/${issueIId}/closed_by`,
+      options,
     );
   }
 
-  participants(projectId: string | number, issueIid: number, options?: Sudo) {
+  edit<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<IssueSchema, C, E, void>> {
+    return RequestHelper.put<IssueSchema>()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}`,
+      options,
+    );
+  }
+
+  metricImages<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<MetricImageSchema, C, E, void>> {
+    return RequestHelper.get<MetricImageSchema>()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/metric_images`,
+      options,
+    );
+  }
+
+  move<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    destinationProjectId: string | number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<IssueSchema, C, E, void>> {
+    return RequestHelper.post<IssueSchema>()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/move`,
+      {
+        toProjectId: destinationProjectId,
+        ...options,
+      },
+    );
+  }
+
+  participants<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<Omit<UserSchema, 'created_at'>, C, E, void>> {
     return RequestHelper.get<Omit<UserSchema, 'created_at'>>()(
       this,
-      endpoint`projects/${projectId}/issues/${issueIid}/participants`,
+      endpoint`projects/${projectId}/issues/${issueIId}/participants`,
       options,
     );
   }
 
-  relatedMergeRequests(projectId: string | number, issueIid: number, options?: BaseRequestOptions) {
-    return RequestHelper.get<MergeRequestSchema>()(
-      this,
-      endpoint`projects/${projectId}/issues/${issueIid}/related_merge_requests`,
-      options,
-    );
-  }
-
-  // TODO move
-  removeLink(
+  // Includes /promote already!
+  promote<E extends boolean = false>(
     projectId: string | number,
-    issueIid: number,
-    issueLinkId: string | number,
-    options?: BaseRequestOptions,
-  ) {
-    return RequestHelper.del()(
+    issueIId: number,
+    body: string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<IssueSchema, C, E, void>> {
+    return RequestHelper.post<IssueSchema>()(
       this,
-      endpoint`projects/${projectId}/issues/${issueIid}/links/${issueLinkId}`,
+      endpoint`projects/${projectId}/issues/${issueIId}/notes`,
       {
+        query: {
+          body: `${body} \n /promote`,
+        },
         ...options,
       },
     );
   }
 
-  remove(projectId: string | number, issueIid: number, options?: Sudo) {
-    return RequestHelper.del()(this, endpoint`projects/${projectId}/issues/${issueIid}`, options);
+  relatedMergeRequests<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<MergeRequestSchema[], C, E, void>> {
+    return RequestHelper.get<MergeRequestSchema[]>()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/related_merge_requests`,
+      options,
+    );
   }
 
-  resetSpentTime(projectId: string | number, issueIid: number, options?: BaseRequestOptions) {
+  remove<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
+    return RequestHelper.del()(this, endpoint`projects/${projectId}/issues/${issueIId}`, options);
+  }
+
+  removeMetricImage<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    imageId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
+    return RequestHelper.del()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/metric_images/${imageId}`,
+      options,
+    );
+  }
+
+  reorder<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<unknown, C, E, void>> {
+    return RequestHelper.put<unknown>()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/reorder`,
+      options,
+    );
+  }
+
+  resetSpentTime<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<TimeStatsSchema, C, E, void>> {
     return RequestHelper.post<TimeStatsSchema>()(
       this,
-      endpoint`projects/${projectId}/issues/${issueIid}/reset_spent_time`,
+      endpoint`projects/${projectId}/issues/${issueIId}/reset_spent_time`,
       options,
     );
   }
 
-  resetTimeEstimate(projectId: string | number, issueIid: number, options?: Sudo) {
+  resetTimeEstimate<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<TimeStatsSchema, C, E, void>> {
     return RequestHelper.post<TimeStatsSchema>()(
       this,
-      endpoint`projects/${projectId}/issues/${issueIid}/reset_time_estimate`,
+      endpoint`projects/${projectId}/issues/${issueIId}/reset_time_estimate`,
       options,
     );
   }
 
-  show(projectId: string | number, issueIid: number, options?: Sudo) {
-    return RequestHelper.get<IssueSchema>()(
-      this,
-      endpoint`projects/${projectId}/issues/${issueIid}`,
-      options,
-    );
+  show<E extends boolean = false>(
+    issueId: number,
+    { projectId, ...options }: { projectId?: string | number } & Sudo & ShowExpanded<E> = {},
+  ): Promise<GitlabAPIResponse<IssueSchema, C, E, void>> {
+    let url: string;
+
+    if (projectId) {
+      url = endpoint`projects/${projectId}/issues/${issueId}`;
+    } else {
+      url = `issues/${issueId}`;
+    }
+
+    return RequestHelper.get<IssueSchema>()(this, url, options as Sudo & ShowExpanded<E>);
   }
 
-  subscribe(projectId: string | number, issueIid: number, options?: Sudo) {
+  subscribe<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<IssueSchema, C, E, void>> {
     return RequestHelper.post<IssueSchema>()(
       this,
-      endpoint`projects/${projectId}/issues/${issueIid}/subscribe`,
+      endpoint`projects/${projectId}/issues/${issueIId}/subscribe`,
       options,
     );
   }
 
-  timeStats(projectId: string | number, issueIid: number, options?: Sudo) {
+  timeStats<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<TimeStatsSchema, C, E, void>> {
     return RequestHelper.get<TimeStatsSchema>()(
       this,
-      endpoint`projects/${projectId}/issues/${issueIid}/time_stats`,
+      endpoint`projects/${projectId}/issues/${issueIId}/time_stats`,
       options,
     );
   }
 
-  unsubscribe(projectId: string | number, issueIid: number, options?: Sudo) {
+  unsubscribe<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<IssueSchema, C, E, void>> {
     return RequestHelper.post<IssueSchema>()(
       this,
-      endpoint`projects/${projectId}/issues/${issueIid}/unsubscribe`,
+      endpoint`projects/${projectId}/issues/${issueIId}/unsubscribe`,
+      options,
+    );
+  }
+
+  uploadMetricImage<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    content: string,
+    { metadata, ...options }: { metadata?: UploadMetadata } & Sudo & ShowExpanded<E> = {},
+  ): Promise<GitlabAPIResponse<MetricImageSchema, C, E, void>> {
+    const meta = {
+      filename: `${Date.now().toString()}.tar.gz`,
+      ...metadata,
+    };
+
+    if (!meta.contentType) meta.contentType = Mime.getType(meta.filename) || undefined;
+
+    return RequestHelper.post<MetricImageSchema>()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/metric_images`,
+      {
+        isForm: true,
+        ...options,
+        file: [content, meta],
+      },
+    );
+  }
+
+  userAgentDetails<E extends boolean = false>(
+    projectId: string | number,
+    issueIId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<UserAgentDetailSchema, C, E, void>> {
+    return RequestHelper.get<UserAgentDetailSchema>()(
+      this,
+      endpoint`projects/${projectId}/issues/${issueIId}/user_agent_details`,
       options,
     );
   }

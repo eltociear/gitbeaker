@@ -86,7 +86,7 @@ export class ProjectImportExport<C extends boolean = false> extends BaseResource
     );
   }
 
-  schedule(projectId: string | number, options?: BaseRequestOptions) {
+  scheduleExport(projectId: string | number, options?: BaseRequestOptions<E>) {
     return RequestHelper.post<{ message: string }>()(
       this,
       endpoint`projects/${projectId}/export`,
