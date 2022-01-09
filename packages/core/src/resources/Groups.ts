@@ -279,13 +279,13 @@ export class Groups<C extends boolean = false> extends BaseResource<C> {
       metadata,
       ...options
     }: { parentId?: number; metadata?: UploadMetadata } & Sudo & ShowExpanded<E> = {},
-  ): Promise<GitlabAPIResponse<void, C, E, void>> {
+  ): Promise<GitlabAPIResponse<unknown, C, E, void>> {
     const meta = { ...metadata };
 
     if (!meta.contentType && meta.filename)
       meta.contentType = Mime.getType(meta.filename) || undefined;
 
-    return RequestHelper.post<void>()(this, endpoint`groups/${groupId}/avatar`, {
+    return RequestHelper.post<unknown>()(this, endpoint`groups/${groupId}/avatar`, {
       isForm: true,
       ...options,
       file: [content, meta],
