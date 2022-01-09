@@ -7,19 +7,10 @@ import type {
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
-import type { ProjectSchema } from './Projects';
+import type { SimpleProjectSchema } from './Projects';
 
 export interface ProjectRepositoryStorageMoveSchema extends RepositoryStorageMoveSchema {
-  project: Pick<
-    ProjectSchema,
-    | 'id'
-    | 'description'
-    | 'name'
-    | 'name_with_namespace'
-    | 'path'
-    | 'path_with_namespace'
-    | 'created_at'
-  >;
+  project: SimpleProjectSchema
 }
 
 export interface ProjectRepositoryStorageMoves<C extends boolean = false>
