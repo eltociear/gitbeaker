@@ -36,8 +36,8 @@ export class GroupLDAPLinks<C extends boolean = false> extends BaseResource<C> {
     groupId: string | number,
     provider: string,
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<string, C, E, void>> {
-    return RequestHelper.del<string>()(this, endpoint`groups/${groupId}/ldap_group_links`, {
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
+    return RequestHelper.del()(this, endpoint`groups/${groupId}/ldap_group_links`, {
       provider,
       ...options,
     });
