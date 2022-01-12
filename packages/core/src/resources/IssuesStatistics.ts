@@ -1,5 +1,6 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { RequestHelper, BaseRequestOptions, endpoint } from '../infrastructure';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type { BaseRequestOptions, GitlabAPIResponse } from '../infrastructure';
 
 export interface StatisticsSchema extends Record<string, unknown> {
   statistics: {
@@ -12,11 +13,15 @@ export interface StatisticsSchema extends Record<string, unknown> {
 }
 
 export class IssuesStatistics<C extends boolean = false> extends BaseResource<C> {
-  all({
+  all<E extends boolean = false>({
     projectId,
     groupId,
     ...options
-  }: { projectId?: string | number; groupId?: string | number } & BaseRequestOptions = {}) {
+  }: (
+    | { projectId?: string | number; groupId?: never }
+    | { groupId?: string | number; projectId?: never }
+  ) &
+    BaseRequestOptions<E> = {}): Promise<GitlabAPIResponse<StatisticsSchema, C, E, void>> {
     let url: string;
 
     if (projectId) {

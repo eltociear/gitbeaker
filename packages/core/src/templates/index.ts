@@ -17,3 +17,4 @@ export { ResourceHooks } from './ResourceHooks';
 export { ResourcePushRules } from './ResourcePushRules';
 export { ResourceRepositoryStorageMoves } from './ResourceRepositoryStorageMoves';
 export { ResourceInvitations } from './ResourceInvitations';
+export { ResourceIterations } from './ResourceIterations';

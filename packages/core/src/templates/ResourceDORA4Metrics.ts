@@ -1,5 +1,7 @@
-import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
-import { endpoint, BaseRequestOptions, RequestHelper, GitlabAPIResponse } from '../infrastructure';
+import { BaseResource } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type { BaseRequestOptions, GitlabAPIResponse } from '../infrastructure';
 
 export type MetricType = 'deployment_frequency' | 'lead_time_for_changes';
 

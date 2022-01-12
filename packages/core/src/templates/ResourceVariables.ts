@@ -1,13 +1,13 @@
-import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
-import {
-  endpoint,
+import { BaseResource } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
+  PaginatedRequestOptions,
   Sudo,
   ShowExpanded,
-  PaginatedRequestOptions,
-  RequestHelper,
-  Camelize,
   GitlabAPIResponse,
+  Camelize,
 } from '../infrastructure';
 
 export interface VariableSchema extends Record<string, unknown> {
@@ -26,7 +26,7 @@ export class ResourceVariables<C extends boolean> extends BaseResource<C> {
     super({ prefixUrl: resourceType, ...options });
   }
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     resourceId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<VariableSchema[], C, E, P>> {

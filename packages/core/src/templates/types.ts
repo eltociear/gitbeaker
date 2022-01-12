@@ -20,3 +20,4 @@ export type { HookSchema, ExpandedHookSchema } from './ResourceHooks';
 export type { PushRulesSchema } from './ResourcePushRules';
 export type { RepositoryStorageMoveSchema } from './ResourceRepositoryStorageMoves';
 export type { InvitationSchema } from './ResourceInvitations';
+export type { IterationSchema } from './ResourceIterations';

@@ -1,15 +1,11 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  BaseRequestOptions,
-  endpoint,
-  PaginatedRequestOptions,
-  RequestHelper,
-  Sudo,
-} from '../infrastructure';
-import { CommitSchema } from './Commits';
-import { RunnerSchema } from './Runners';
-import { UserSchema } from './Users';
-import { PipelineSchema } from './Pipelines';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type { Sudo, ShowExpanded, GitlabAPIResponse } from '../infrastructure';
+import type { SimpleProjectSchema } from './Projects';
+import type { CondensedCommitSchema } from './Commits';
+import type { RunnerSchema } from './Runners';
+import type { UserSchema, ExpandedUserSchema } from './Users';
+import type { PipelineSchema } from './Pipelines';
 
 export type JobScope =
   | 'created'
@@ -28,11 +24,19 @@ export interface ArtifactSchema extends Record<string, unknown> {
   file_format?: string;
 }
 
+export interface CondensedJobSchema extends Record<string, unknown> {
+  id: number;
+  name: string;
+  stage: string;
+  project_id: string | number;
+  project_name: string;
+}
+
 export interface JobSchema extends Record<string, unknown> {
   id: number;
-  status: string;
-  stage: string;
   name: string;
+  stage: string;
+  status: string;
   ref: string;
   tag: boolean;
   coverage?: string;
@@ -41,21 +45,23 @@ export interface JobSchema extends Record<string, unknown> {
   started_at?: Date;
   finished_at?: Date;
   duration?: number;
-  user: UserSchema;
-  commit: CommitSchema;
+  user: ExpandedUserSchema;
+  commit: CondensedCommitSchema;
   pipeline: PipelineSchema;
   web_url: string;
   artifacts: ArtifactSchema[];
+  queued_duration: number;
+  artifacts_file: {
+    filename: string;
+    size: number;
+  };
   runner: RunnerSchema;
   artifacts_expire_at?: Date;
   tag_list?: string[];
 }
 
 export interface BridgeSchema extends Record<string, unknown> {
-  commit: Pick<
-    CommitSchema,
-    'id' | 'short_id' | 'author_name' | 'author_email' | 'message' | 'title' | 'created_at'
-  >;
+  commit: CondensedCommitSchema;
   coverage?: string;
   allow_failure: boolean;
   created_at: string;
@@ -71,16 +77,47 @@ export interface BridgeSchema extends Record<string, unknown> {
   status: string;
   tag: boolean;
   web_url: string;
-  user: UserSchema;
+  user: ExpandedUserSchema;
   downstream_pipeline: Omit<PipelineSchema, 'user'>;
 }
 
+export interface AllowedAgentSchema extends Record<string, unknown> {
+  id: number;
+  config_project: Omit<SimpleProjectSchema, 'web_url'>;
+}
+
+export interface JobKubernetesAgentsSchema extends Record<string, unknown> {
+  allowed_agents: AllowedAgentSchema[];
+  job: CondensedJobSchema;
+  pipeline: PipelineSchema;
+  project: Omit<SimpleProjectSchema, 'web_url'>;
+  user: UserSchema;
+}
+
 export class Jobs<C extends boolean = false> extends BaseResource<C> {
-  all(projectId: string | number, options?: PaginatedRequestOptions) {
-    return RequestHelper.get<JobSchema[]>()(this, endpoint`projects/${projectId}/jobs`, options);
+  all<E extends boolean = false>(
+    projectId: string | number,
+    {
+      pipelineId,
+      ...options
+    }: { pipelineId?: number; scope?: JobScope } & Sudo & ShowExpanded<E> = {},
+  ): Promise<GitlabAPIResponse<JobSchema[], C, E, void>> {
+    let url: string;
+
+    if (pipelineId) {
+      url = endpoint`projects/${projectId}/pipelines/${pipelineId}/jobs`;
+    } else {
+      url = endpoint`projects/${projectId}/jobs`;
+    }
+
+    return RequestHelper.get<JobSchema[]>()(this, url, { ...options });
   }
 
-  cancel(projectId: string | number, jobId: number, options?: Sudo) {
+  cancel<E extends boolean = false>(
+    projectId: string | number,
+    jobId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<JobSchema, C, E, void>> {
     return RequestHelper.post<JobSchema>()(
       this,
       endpoint`projects/${projectId}/jobs/${jobId}/cancel`,
@@ -88,60 +125,23 @@ export class Jobs<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  // TODO move
-  downloadSingleArtifactFile(
+  downloadTraceFile<E extends boolean = false>(
     projectId: string | number,
     jobId: number,
-    artifactPath: string,
-    { stream = false, ...options }: { stream?: boolean } & BaseRequestOptions = {},
-  ) {
-    const [pId, jId] = [projectId, jobId].map(encodeURIComponent);
-    const url = `projects/${pId}/jobs/${jId}/artifacts/${artifactPath}`;
-
-    if (stream) {
-      return RequestHelper.stream(this, url, options);
-    }
-    return RequestHelper.get()(this, url, options);
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+    return RequestHelper.get<Blob>()(
+      this,
+      endpoint`projects/${projectId}/jobs/${jobId}/trace`,
+      options,
+    );
   }
 
-  // TODO move
-  downloadSingleArtifactFileFromRef(
+  erase<E extends boolean = false>(
     projectId: string | number,
-    ref: string,
-    artifactPath: string,
-    jobName: string,
-    { stream = false, ...options }: { stream?: boolean } & BaseRequestOptions = {},
-  ) {
-    const [pId, rId, name] = [projectId, ref, jobName].map(encodeURIComponent);
-    const url = `projects/${pId}/jobs/artifacts/${rId}/raw/${artifactPath}?job=${name}`;
-
-    if (stream) {
-      return RequestHelper.stream(this, url, options);
-    }
-    return RequestHelper.get()(this, url, options);
-  }
-
-  // TODO move
-  downloadLatestArtifactFile(
-    projectId: string | number,
-    ref: string,
-    jobName: string,
-    { stream = false, ...options }: { stream?: boolean } & BaseRequestOptions = {},
-  ) {
-    const [pId, rId, name] = [projectId, ref, jobName].map(encodeURIComponent);
-    const url = `projects/${pId}/jobs/artifacts/${rId}/download?job=${name}`;
-
-    if (stream) {
-      return RequestHelper.stream(this, url, options);
-    }
-    return RequestHelper.get()(this, url, options);
-  }
-
-  downloadTraceFile(projectId: string | number, jobId: number, options?: Sudo) {
-    return RequestHelper.get()(this, endpoint`projects/${projectId}/jobs/${jobId}/trace`, options);
-  }
-
-  erase(projectId: string | number, jobId: number, options?: Sudo) {
+    jobId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<JobSchema, C, E, void>> {
     return RequestHelper.post<JobSchema>()(
       this,
       endpoint`projects/${projectId}/jobs/${jobId}/erase`,
@@ -149,21 +149,23 @@ export class Jobs<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  // TODO move
-  eraseArtifacts(projectId: string | number, jobId: number, options?: Sudo) {
-    const [pId, jId] = [projectId, jobId].map(encodeURIComponent);
-
-    return RequestHelper.del()(this, `projects/${pId}/jobs/${jId}/artifacts`, options);
+  pipelineBridges<E extends boolean = false>(
+    projectId: string | number,
+    pipelineId: number,
+    options?: { scope?: JobScope } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<BridgeSchema[], C, E, void>> {
+    return RequestHelper.get<BridgeSchema[]>()(
+      this,
+      endpoint`projects/${projectId}/pipelines/${pipelineId}/bridges`,
+      options,
+    );
   }
 
-  // TODO move
-  keepArtifacts(projectId: string | number, jobId: number, options?: Sudo) {
-    const [pId, jId] = [projectId, jobId].map(encodeURIComponent);
-
-    return RequestHelper.post()(this, `projects/${pId}/jobs/${jId}/artifacts/keep`, options);
-  }
-
-  play(projectId: string | number, jobId: number, options?: Sudo) {
+  play<E extends boolean = false>(
+    projectId: string | number,
+    jobId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<JobSchema, C, E, void>> {
     return RequestHelper.post<JobSchema>()(
       this,
       endpoint`projects/${projectId}/jobs/${jobId}/play`,
@@ -171,7 +173,11 @@ export class Jobs<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  retry(projectId: string | number, jobId: number, options?: Sudo) {
+  retry<E extends boolean = false>(
+    projectId: string | number,
+    jobId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<JobSchema, C, E, void>> {
     return RequestHelper.post<JobSchema>()(
       this,
       endpoint`projects/${projectId}/jobs/${jobId}/retry`,
@@ -179,7 +185,11 @@ export class Jobs<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  show(projectId: string | number, jobId: number, options?: Sudo) {
+  show<E extends boolean = false>(
+    projectId: string | number,
+    jobId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<JobSchema, C, E, void>> {
     return RequestHelper.get<JobSchema>()(
       this,
       endpoint`projects/${projectId}/jobs/${jobId}`,
@@ -187,27 +197,19 @@ export class Jobs<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  showPipelineJobs(
-    projectId: string | number,
-    pipelineId: number,
-    options?: { scope?: JobScope } & Sudo,
-  ) {
-    return RequestHelper.get<JobSchema[]>()(
-      this,
-      endpoint`projects/${projectId}/pipelines/${pipelineId}/jobs`,
-      options,
-    );
+  showConnectedJob<E extends boolean = false>(
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<JobSchema, C, E, void>> {
+    if (!this.headers['job-token']) throw new Error('Missing required header "job-token"');
+
+    return RequestHelper.get<JobSchema>()(this, 'jobs', options);
   }
 
-  showPipelineBridges(
-    projectId: string | number,
-    pipelineId: number,
-    options?: { scope?: JobScope } & Sudo,
-  ) {
-    return RequestHelper.get<BridgeSchema>()(
-      this,
-      endpoint`projects/${projectId}/pipelines/${pipelineId}/bridges`,
-      options,
-    );
+  showConnectedJobK8Agents<E extends boolean = false>(
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<JobKubernetesAgentsSchema, C, E, void>> {
+    if (!this.headers['job-token']) throw new Error('Missing required header "job-token"');
+
+    return RequestHelper.get<JobKubernetesAgentsSchema>()(this, 'jobs/allowed_agents', options);
   }
 }

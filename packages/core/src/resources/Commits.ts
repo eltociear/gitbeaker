@@ -29,15 +29,20 @@ export interface CommitAction {
 }
 
 // Response structures
-export interface CommitSchema extends Record<string, unknown> {
+
+export interface CondensedCommitSchema extends Record<string, unknown> {
   id: string;
   short_id: string;
-  created_at: Date;
-  parent_ids?: string[];
-  title: string;
   message: string;
-  author_name: string;
+  title: string;
   author_email: string;
+  author_name: string;
+  created_at: string;
+}
+
+export interface CommitSchema extends CondensedCommitSchema {
+  parent_ids?: string[];
+  message: string;
   authored_date?: Date;
   committer_name?: string;
   committer_email?: string;

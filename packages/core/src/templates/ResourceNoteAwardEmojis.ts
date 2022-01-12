@@ -1,12 +1,14 @@
-import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
-import { AwardEmojiSchema, url } from './ResourceAwardEmojis';
-import {
+import { BaseResource } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import { RequestHelper } from '../infrastructure';
+import type {
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
+import type { AwardEmojiSchema } from './ResourceAwardEmojis';
+import { url } from './ResourceAwardEmojis';
 
 export class ResourceNoteAwardEmojis<C extends boolean = false> extends BaseResource<C> {
   protected resourceType: string;
@@ -17,7 +19,7 @@ export class ResourceNoteAwardEmojis<C extends boolean = false> extends BaseReso
     this.resourceType = resourceType;
   }
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     resourceIId: number,
     noteId: number,

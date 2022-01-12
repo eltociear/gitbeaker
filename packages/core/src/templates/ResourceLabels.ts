@@ -1,9 +1,8 @@
-import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
-import {
-  endpoint,
-  BaseRequestOptions,
+import { BaseResource } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
@@ -29,7 +28,7 @@ export class ResourceLabels<C extends boolean = false> extends BaseResource<C> {
     super({ prefixUrl: resourceType, ...options });
   }
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     resourceId: string | number,
     options?: PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<LabelSchema[], C, E, P>> {
@@ -40,7 +39,7 @@ export class ResourceLabels<C extends boolean = false> extends BaseResource<C> {
     resourceId: string | number,
     labelName: string,
     color: string,
-    options?: BaseRequestOptions<E>,
+    options?: { description?: string; priority?: number } & Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<LabelSchema, C, E, void>> {
     return RequestHelper.post<LabelSchema>()(this, endpoint`${resourceId}/labels`, {
       name: labelName,
@@ -52,11 +51,29 @@ export class ResourceLabels<C extends boolean = false> extends BaseResource<C> {
   edit<E extends boolean = false>(
     resourceId: string | number,
     labelId: number | string,
-    options?: BaseRequestOptions<E>,
+    options?: ({ newName: string; color: never } | { newName: never; color: string }) & {
+      description?: string;
+      priority?: number;
+    } & Sudo &
+      ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<LabelSchema, C, E, void>> {
+    if (!options?.newName && !options?.color) throw new Error('color or newName must be supplied');
+
     return RequestHelper.put<LabelSchema>()(
       this,
       endpoint`${resourceId}/labels/${labelId}`,
+      options,
+    );
+  }
+
+  promote<E extends boolean = false>(
+    resourceId: string | number,
+    labelId: number | string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<LabelSchema, C, E, void>> {
+    return RequestHelper.put<LabelSchema>()(
+      this,
+      endpoint`${resourceId}/labels/${labelId}/promote`,
       options,
     );
   }
