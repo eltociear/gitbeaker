@@ -10,7 +10,12 @@ export type {
 } from './ResourceDiscussions';
 export type { IssueBoardListSchema, IssueBoardSchema } from './ResourceIssueBoards';
 export type { LabelSchema } from './ResourceLabels';
-export type { MemberSchema, IncludeInherited } from './ResourceMembers';
+export type {
+  MemberSchema,
+  CondensedMemberSchema,
+  SimpleMemberSchema,
+  IncludeInherited,
+} from './ResourceMembers';
 export type { MilestoneSchema } from './ResourceMilestones';
 export type { NoteSchema } from './ResourceNotes';
 export type { TemplateSchema } from './ResourceTemplates';

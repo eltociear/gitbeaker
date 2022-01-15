@@ -263,7 +263,7 @@ export class Conan<C extends boolean = false> extends BaseResource<C> {
       contentType: Mime.getType(filename),
     };
 
-    return RequestHelper.get<Blob>()(
+    return RequestHelper.get<unknown>()(
       this,
       `${url(
         options?.projectId,

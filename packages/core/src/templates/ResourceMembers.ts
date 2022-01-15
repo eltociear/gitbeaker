@@ -14,16 +14,22 @@ export interface IncludeInherited {
   includeInherited?: boolean;
 }
 
-export interface MemberSchema extends Record<string, unknown> {
+export interface CondensedMemberSchema extends Record<string, unknown> {
   id: number;
   username: string;
   name: string;
   state: string;
   avatar_url: string;
   web_url: string;
+}
+
+export interface SimpleMemberSchema extends CondensedMemberSchema {
   expires_at: string;
   access_level: AccessLevel;
   email: string;
+}
+
+export interface MemberSchema extends SimpleMemberSchema {
   group_saml_identity: {
     extern_uid: string;
     provider: string;
@@ -53,12 +59,11 @@ export class ResourceMembers<C extends boolean = false> extends BaseResource<C> 
     resourceId: string | number,
     options: IncludeInherited & PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<MemberSchema[], C, E, P>> {
-    const rId = encodeURIComponent(resourceId);
-    const url = [rId, 'members'];
+    let url = endpoint`${resourceId}/members`;
 
-    if (options.includeInherited) url.push('all');
+    if (options.includeInherited) url += '/all';
 
-    return RequestHelper.get<MemberSchema[]>()(this, url.join('/'), options);
+    return RequestHelper.get<MemberSchema[]>()(this, url, options);
   }
 
   edit<E extends boolean = false>(
@@ -88,7 +93,7 @@ export class ResourceMembers<C extends boolean = false> extends BaseResource<C> 
     return RequestHelper.get<MemberSchema>()(
       this,
       url.join('/'),
-      options as Record<string, unknown>,
+      options as Sudo & ShowExpanded<E>,
     );
   }
 
