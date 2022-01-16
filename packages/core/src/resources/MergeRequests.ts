@@ -163,6 +163,10 @@ export interface CondensedMergeRequestSchema extends Record<string, unknown> {
   state: string;
   created_at: string;
   updated_at: string;
+  web_url: string;
+}
+
+export interface MergeRequestSchema extends CondensedMergeRequestSchema {
   merged_by: Omit<UserSchema, 'created_at'>;
   merged_at: string;
   closed_by?: Omit<UserSchema, 'created_at'>;
@@ -197,7 +201,6 @@ export interface CondensedMergeRequestSchema extends Record<string, unknown> {
   force_remove_source_branch: boolean;
   reference: string;
   references: ReferenceSchema;
-  web_url: string;
   time_stats: TimeStatsSchema;
   squash: boolean;
   task_completion_status: TaskCompletionStatusSchema;
@@ -206,7 +209,7 @@ export interface CondensedMergeRequestSchema extends Record<string, unknown> {
   approvals_before_merge?: unknown;
 }
 
-export interface MergeRequestSchema extends CondensedMergeRequestSchema {
+export interface ExpandedMergeRequestSchema extends MergeRequestSchema {
   subscribed: boolean;
   changes_count: string;
   latest_build_started_at: string;
@@ -222,7 +225,7 @@ export interface MergeRequestSchema extends CondensedMergeRequestSchema {
   };
 }
 
-export interface MergeRequestWithChangesSchema extends MergeRequestSchema {
+export interface MergeRequestWithChangesSchema extends ExpandedMergeRequestSchema {
   changes?: MergeRequestChanges[];
   overflow: boolean;
 }
@@ -230,7 +233,7 @@ export interface MergeRequestWithChangesSchema extends MergeRequestSchema {
 export interface MergeRequestTodoSchema extends TodoSchema {
   project: SimpleProjectSchema;
   target_type: 'MergeRequest';
-  target: MergeRequestSchema;
+  target: ExpandedMergeRequestSchema;
 }
 
 // Export API
@@ -271,7 +274,7 @@ export class MergeRequests<C extends boolean = false> extends BaseResource<C> {
         | { groupId?: string | number; projectId?: never }
       ) &
       PaginatedRequestOptions<E, P> = {} as any,
-  ): Promise<GitlabAPIResponse<CondensedMergeRequestSchema[], C, E, P>> {
+  ): Promise<GitlabAPIResponse<MergeRequestSchema[], C, E, P>> {
     let prefix = '';
 
     if (projectId) {
@@ -280,7 +283,7 @@ export class MergeRequests<C extends boolean = false> extends BaseResource<C> {
       prefix = endpoint`groups/${groupId}/`;
     }
 
-    return RequestHelper.get<CondensedMergeRequestSchema[]>()(
+    return RequestHelper.get<MergeRequestSchema[]>()(
       this,
       `${prefix}merge_requests`,
       options as AllMergeRequestsOptions & PaginatedRequestOptions<E, P>,
@@ -291,8 +294,8 @@ export class MergeRequests<C extends boolean = false> extends BaseResource<C> {
     projectId: string | number,
     mergerequestIId: number,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<MergeRequestSchema, C, E, void>> {
-    return RequestHelper.post<MergeRequestSchema>()(
+  ): Promise<GitlabAPIResponse<ExpandedMergeRequestSchema, C, E, void>> {
+    return RequestHelper.post<ExpandedMergeRequestSchema>()(
       this,
       endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/cancel_merge_when_pipeline_succeeds`,
       options,
@@ -341,8 +344,8 @@ export class MergeRequests<C extends boolean = false> extends BaseResource<C> {
     targetBranch: string,
     title: string,
     options?: CreateMergeRequestOptions & BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<MergeRequestSchema, C, E, void>> {
-    return RequestHelper.post<MergeRequestSchema>()(
+  ): Promise<GitlabAPIResponse<ExpandedMergeRequestSchema, C, E, void>> {
+    return RequestHelper.post<ExpandedMergeRequestSchema>()(
       this,
       endpoint`projects/${projectId}/merge_requests`,
       {
@@ -525,8 +528,8 @@ export class MergeRequests<C extends boolean = false> extends BaseResource<C> {
       includeRebaseInProgress?: boolean;
     } & Sudo &
       ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<MergeRequestSchema, C, E, void>> {
-    return RequestHelper.get<MergeRequestSchema>()(
+  ): Promise<GitlabAPIResponse<ExpandedMergeRequestSchema, C, E, void>> {
+    return RequestHelper.get<ExpandedMergeRequestSchema>()(
       this,
       endpoint`projects/${projectId}/merge_requests/${mergerequestIId}`,
       options,
@@ -562,8 +565,8 @@ export class MergeRequests<C extends boolean = false> extends BaseResource<C> {
     projectId: string | number,
     mergerequestIId: number,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<MergeRequestSchema, C, E, void>> {
-    return RequestHelper.post<MergeRequestSchema>()(
+  ): Promise<GitlabAPIResponse<ExpandedMergeRequestSchema, C, E, void>> {
+    return RequestHelper.post<ExpandedMergeRequestSchema>()(
       this,
       endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/subscribe`,
       options,
@@ -574,8 +577,8 @@ export class MergeRequests<C extends boolean = false> extends BaseResource<C> {
     projectId: string | number,
     mergerequestIId: number,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<MergeRequestSchema, C, E, void>> {
-    return RequestHelper.post<MergeRequestSchema>()(
+  ): Promise<GitlabAPIResponse<ExpandedMergeRequestSchema, C, E, void>> {
+    return RequestHelper.post<ExpandedMergeRequestSchema>()(
       this,
       endpoint`projects/${projectId}/merge_requests/${mergerequestIId}/unsubscribe`,
       options,
