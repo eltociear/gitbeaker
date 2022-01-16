@@ -7,8 +7,9 @@ import type {
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
-import { UserSchema } from './Users';
-import { GroupSchema } from './Groups';
+import type { TodoSchema } from './Todos';
+import type { UserSchema } from './Users';
+import type { GroupSchema } from './Groups';
 
 export interface EpicSchema extends Record<string, unknown> {
   id: number;
@@ -48,17 +49,10 @@ export interface EpicSchema extends Record<string, unknown> {
   };
 }
 
-export interface EpicTodoSchema extends Record<string, unknown> {
-  id: number;
+export interface EpicTodoSchema extends TodoSchema {
   group: Pick<GroupSchema, 'id' | 'name' | 'path' | 'kind' | 'full_path' | 'parent_id'>;
-  author: Omit<UserSchema, 'created_at'>;
-  action_name: string;
-  target_type: string;
+  target_type: 'Epic';
   target: EpicSchema;
-  target_url: string;
-  body: string;
-  state: string;
-  created_at: string;
 }
 
 export class Epics<C extends boolean = false> extends BaseResource<C> {

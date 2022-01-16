@@ -48,7 +48,7 @@ export class AuditEvents<C extends boolean = false> extends BaseResource<C> {
       | { projectId?: string | number; groupId?: never }
       | { groupId?: string | number; projectId?: never }
     ) &
-      PaginatedRequestOptions<E, P> = {} as any,
+      PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<AuditEventSchema[], C, E, P>> {
     const uri = url(options);
 
