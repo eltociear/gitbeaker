@@ -1,53 +1,53 @@
-import { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { ResourceNotes } from '../templates';
-import { NoteSchema } from '../templates/types';
-import {
+import type { NoteSchema } from '../templates/types';
+import type {
   PaginatedRequestOptions,
-  BaseRequestOptions,
   Sudo,
-  CamelizedResponse,
+  ShowExpanded,
+  GitlabAPIResponse,
 } from '../infrastructure';
 
 export interface SnippetNoteSchema extends NoteSchema {
+  confidential: boolean;
   file_name: string;
   expires_at: string;
 }
 
 export interface ProjectSnippetNotes<C extends boolean = false> extends ResourceNotes<C> {
-  all(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
-    snippetId: string | number,
-    options?: PaginatedRequestOptions,
-  ): Promise<CamelizedResponse<C, SnippetNoteSchema>[]>;
+    snippedId: number,
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<SnippetNoteSchema[], C, E, P>>;
 
-  create(
+  create<E extends boolean = false>(
     projectId: string | number,
-    snippetId: string | number,
+    snippedId: number,
     body: string,
-    options?: BaseRequestOptions,
-  ): Promise<CamelizedResponse<C, SnippetNoteSchema>>;
+    options?: { created_at?: string } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<SnippetNoteSchema, C, E, void>>;
 
-  edit(
+  edit<E extends boolean = false>(
     projectId: string | number,
-    snippetId: string | number,
+    snippedId: number,
     noteId: number,
-    body: string,
-    options?: BaseRequestOptions,
-  ): Promise<CamelizedResponse<C, SnippetNoteSchema>>;
+    options: { body: string } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<SnippetNoteSchema, C, E, void>>;
 
-  remove(
+  remove<E extends boolean = false>(
     projectId: string | number,
-    snippetId: string | number,
+    snippedId: number,
     noteId: number,
     options?: Sudo,
-  ): Promise<void>;
+  ): Promise<GitlabAPIResponse<void, C, E, void>>;
 
-  show(
+  show<E extends boolean = false>(
     projectId: string | number,
-    snippetId: string | number,
+    snippedId: number,
     noteId: number,
-    options?: Sudo,
-  ): Promise<CamelizedResponse<C, SnippetNoteSchema>>;
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<SnippetNoteSchema, C, E, void>>;
 }
 
 export class ProjectSnippetNotes<C extends boolean = false> extends ResourceNotes<C> {

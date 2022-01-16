@@ -1,22 +1,21 @@
-import { BaseResource, BaseResourceOptions } from '@gitbeaker/requester-utils';
-import { UserSchema } from '../resources/Users';
-import {
-  endpoint,
+import { BaseResource } from '@gitbeaker/requester-utils';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
   ShowExpanded,
   GitlabAPIResponse,
 } from '../infrastructure';
+import { UserSchema } from '../resources/Users';
 
 export interface NoteSchema extends Record<string, unknown> {
   id: number;
   body: string;
-  author: UserSchema;
+  author: Omit<UserSchema, 'created_at'>;
   created_at: string;
   updated_at: string;
-  confidential: boolean;
 }
 
 export class ResourceNotes<C extends boolean = false> extends BaseResource<C> {
@@ -28,7 +27,7 @@ export class ResourceNotes<C extends boolean = false> extends BaseResource<C> {
     this.resource2Type = resource2Type;
   }
 
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'keyset'>(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     resourceId: string | number,
     resource2Id: string | number,
     options?: PaginatedRequestOptions<E, P>,
@@ -44,7 +43,7 @@ export class ResourceNotes<C extends boolean = false> extends BaseResource<C> {
     resourceId: string | number,
     resource2Id: string | number,
     body: string,
-    options?: BaseRequestOptions<E>,
+    options?: Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<NoteSchema, C, E, void>> {
     return RequestHelper.post<NoteSchema>()(
       this,
@@ -60,16 +59,12 @@ export class ResourceNotes<C extends boolean = false> extends BaseResource<C> {
     resourceId: string | number,
     resource2Id: string | number,
     noteId: number,
-    body: string,
-    options?: BaseRequestOptions<E>,
+    options?: { body?: string } & Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<NoteSchema, C, E, void>> {
     return RequestHelper.put<NoteSchema>()(
       this,
       endpoint`${resourceId}/${this.resource2Type}/${resource2Id}/notes/${noteId}`,
-      {
-        body,
-        ...options,
-      },
+      options,
     );
   }
 

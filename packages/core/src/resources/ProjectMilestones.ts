@@ -1,55 +1,88 @@
-import { BaseResourceOptions } from '@gitbeaker/requester-utils';
-import { IssueSchema } from './Issues';
-import { MergeRequestSchema } from './MergeRequests';
+import type { BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { ResourceMilestones } from '../templates';
-import { MilestoneSchema } from '../templates/types';
-import {
+import type { MilestoneSchema } from '../templates/types';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   PaginatedRequestOptions,
-  BaseRequestOptions,
   Sudo,
-  CamelizedResponse,
+  ShowExpanded,
+  GitlabAPIResponse,
 } from '../infrastructure';
+import type { IssueSchema } from './Issues';
+import type { MergeRequestSchema } from './MergeRequests';
 
 export interface ProjectMilestones<C extends boolean = false> extends ResourceMilestones<C> {
-  all(
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
-    options?: PaginatedRequestOptions,
-  ): Promise<CamelizedResponse<C, MilestoneSchema>[]>;
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<MilestoneSchema[], C, E, P>>;
 
-  create(
+  assignedIssues<E extends boolean = false>(
+    projectId: string | number,
+    milestoneId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<IssueSchema[], C, E, void>>;
+
+  assignedMergeRequests<E extends boolean = false>(
+    projectId: string | number,
+    milestoneId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<MergeRequestSchema[], C, E, void>>;
+
+  burndownChartEvents<E extends boolean = false>(
+    projectId: string | number,
+    milestoneId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<unknown, C, E, void>>;
+
+  create<E extends boolean = false>(
     projectId: string | number,
     title: string,
-    options?: BaseRequestOptions,
-  ): Promise<CamelizedResponse<C, MilestoneSchema>>;
+    options?: { description?: string; dueDate?: string; startDate?: string } & Sudo &
+      ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<MilestoneSchema, C, E, void>>;
 
-  edit(
+  edit<E extends boolean = false>(
     projectId: string | number,
     milestoneId: number,
-    options?: BaseRequestOptions,
-  ): Promise<CamelizedResponse<C, MilestoneSchema>>;
+    options?: {
+      title?: string;
+      description?: string;
+      dueDate?: string;
+      startDate?: string;
+      startEvent?: 'close' | 'activate';
+    } & Sudo &
+      ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<MilestoneSchema, C, E, void>>;
 
-  issues(
+  remove<E extends boolean = false>(
     projectId: string | number,
     milestoneId: number,
-    options?: Sudo,
-  ): Promise<CamelizedResponse<C, IssueSchema>[]>;
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>>;
 
-  mergeRequests(
+  show<E extends boolean = false>(
     projectId: string | number,
     milestoneId: number,
-    options?: Sudo,
-  ): Promise<CamelizedResponse<C, MergeRequestSchema>[]>;
-
-  show(
-    projectId: string | number,
-    milestoneId: number,
-    options?: Sudo,
-  ): Promise<CamelizedResponse<C, MilestoneSchema>>;
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<MilestoneSchema, C, E, void>>;
 }
 
 export class ProjectMilestones<C extends boolean = false> extends ResourceMilestones<C> {
   constructor(options: BaseResourceOptions<C>) {
     /* istanbul ignore next */
     super('projects', options);
+  }
+
+  promote<E extends boolean = false>(
+    projectId: string | number,
+    milestoneId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<unknown, C, E, void>> {
+    return RequestHelper.post<unknown>()(
+      this,
+      endpoint`${projectId}/milestones/${milestoneId}/promote`,
+      options,
+    );
   }
 }

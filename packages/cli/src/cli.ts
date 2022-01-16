@@ -92,7 +92,7 @@ function param(value: string): string {
   let cleaned = value;
 
   // Handle exceptions
-  const exceptions = ['GitLabCI', 'YML', 'GPG', 'SSH', 'IId'];
+  const exceptions = ['GitLabCI', 'YML', 'GPG', 'SSH', 'IId', 'NPM', 'NuGet'];
 
   const ex = exceptions.find((e) => value.includes(e));
 
