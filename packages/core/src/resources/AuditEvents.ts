@@ -1,11 +1,6 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
 import { endpoint, RequestHelper } from '../infrastructure';
-import type {
-  PaginatedRequestOptions,
-  Sudo,
-  ShowExpanded,
-  GitlabAPIResponse,
-} from '../infrastructure';
+import type { Sudo, ShowExpanded, GitlabAPIResponse } from '../infrastructure';
 
 export interface AuditEventSchema extends Record<string, unknown> {
   id: number;
@@ -43,13 +38,14 @@ const url = ({
 };
 
 export class AuditEvents<C extends boolean = false> extends BaseResource<C> {
-  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
+  all<E extends boolean = false>(
     options: (
       | { projectId?: string | number; groupId?: never }
       | { groupId?: string | number; projectId?: never }
     ) &
-      PaginatedRequestOptions<E, P>,
-  ): Promise<GitlabAPIResponse<AuditEventSchema[], C, E, P>> {
+      Sudo &
+      ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<AuditEventSchema[], C, E, void>> {
     const uri = url(options);
 
     return RequestHelper.get<AuditEventSchema[]>()(this, uri, options);
