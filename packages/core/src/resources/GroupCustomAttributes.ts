@@ -17,20 +17,20 @@ export interface GroupCustomAttributes<C extends boolean = false>
 
   set<E extends boolean = false>(
     groupId: string | number,
-    customAttributeId: number,
+    customAttributeId: string,
     value: string,
     options?: Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<CustomAttributeSchema, C, E, void>>;
 
   remove<E extends boolean = false>(
     groupId: string | number,
-    customAttributeId: number,
+    customAttributeId: string,
     options?: Sudo,
   ): Promise<GitlabAPIResponse<void, C, E, void>>;
 
   show<E extends boolean = false>(
     groupId: string | number,
-    customAttributeId: number,
+    customAttributeId: string,
     options?: Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<CustomAttributeSchema, C, E, void>>;
 }

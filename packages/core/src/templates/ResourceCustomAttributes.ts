@@ -31,7 +31,7 @@ export class ResourceCustomAttributes<C extends boolean = false> extends BaseRes
 
   remove<E extends boolean = false>(
     resourceId: string | number,
-    customAttributeId: number,
+    customAttributeId: string,
     options?: Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
@@ -43,7 +43,7 @@ export class ResourceCustomAttributes<C extends boolean = false> extends BaseRes
 
   set<E extends boolean = false>(
     resourceId: string | number,
-    customAttributeId: number,
+    customAttributeId: string,
     value: string,
     options?: Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<CustomAttributeSchema, C, E, void>> {
@@ -59,7 +59,7 @@ export class ResourceCustomAttributes<C extends boolean = false> extends BaseRes
 
   show<E extends boolean = false>(
     resourceId: string | number,
-    customAttributeId: number,
+    customAttributeId: string,
     options?: Sudo & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<CustomAttributeSchema, C, E, void>> {
     return RequestHelper.get<CustomAttributeSchema>()(
