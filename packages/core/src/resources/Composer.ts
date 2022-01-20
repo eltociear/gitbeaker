@@ -109,10 +109,12 @@ export class Composer<C extends boolean = false> extends BaseResource<C> {
     groupId: string | number,
     options?: { composerVersion: '1' } & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<ComposerV1BaseRepositorySchema, C, E, void>>;
+
   showBaseRepository<E extends boolean = false>(
     groupId: string | number,
     options?: { composerVersion: '2' } & ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<ComposerV2BaseRepositorySchema, C, E, void>>;
+
   showBaseRepository<E extends boolean = false>(
     groupId: string | number,
     options?: { composerVersion?: '1' | '2' } & ShowExpanded<E>,

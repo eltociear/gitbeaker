@@ -9,7 +9,7 @@ import type {
   GitlabAPIResponse,
 } from '../infrastructure';
 
-export interface GroupInvitations<C extends boolean = false> {
+export interface ProjectInvitations<C extends boolean = false> {
   all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     projectId: string | number,
     options?: PaginatedRequestOptions<E, P>,

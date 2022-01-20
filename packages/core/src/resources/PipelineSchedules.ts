@@ -1,15 +1,10 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { UserSchema } from './Users';
-import { PipelineSchema, PipelineVariableSchema } from './Pipelines';
-import {
-  BaseRequestOptions,
-  endpoint,
-  PaginatedRequestOptions,
-  RequestHelper,
-  Sudo,
-} from '../infrastructure';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type { Sudo, ShowExpanded, GitlabAPIResponse } from '../infrastructure';
+import type { UserSchema } from './Users';
+import type { PipelineSchema, PipelineVariableSchema } from './Pipelines';
 
-export interface PipelineScheduleSchema extends Record<string, unknown> {
+export interface CondensedPipelineScheduleSchema extends Record<string, unknown> {
   id: number;
   description: string;
   ref: string;
@@ -19,30 +14,38 @@ export interface PipelineScheduleSchema extends Record<string, unknown> {
   active: boolean;
   created_at: string;
   updated_at: string;
-  owner: Pick<UserSchema, 'name' | 'username' | 'id' | 'state' | 'avatar_url' | 'web_url'>;
+  owner: Omit<UserSchema, 'created_at'>;
 }
 
-export interface PipelineScheduleExtendedSchema extends PipelineScheduleSchema {
+export interface PipelineScheduleSchema extends CondensedPipelineScheduleSchema {
   last_pipeline: Pick<PipelineSchema, 'id' | 'sha' | 'ref' | 'status'>;
 }
 
+export interface ExpandedPipelineScheduleSchema extends PipelineScheduleSchema {
+  last_pipeline: Pick<PipelineSchema, 'id' | 'sha' | 'ref' | 'status'>;
+  variables: PipelineVariableSchema[];
+}
+
 export class PipelineSchedules<C extends boolean = false> extends BaseResource<C> {
-  all(projectId: string | number, options?: PaginatedRequestOptions) {
-    return RequestHelper.get<PipelineScheduleSchema[]>()(
+  all<E extends boolean = false>(
+    projectId: string | number,
+    options?: { scope?: 'active' | 'inactive' } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<CondensedPipelineScheduleSchema[], C, E, void>> {
+    return RequestHelper.get<CondensedPipelineScheduleSchema[]>()(
       this,
       endpoint`projects/${projectId}/pipeline_schedules`,
       options,
     );
   }
 
-  create(
+  create<E extends boolean = false>(
     projectId: string | number,
     description: string,
     ref: string,
     cron: string,
-    options?: BaseRequestOptions,
-  ) {
-    return RequestHelper.post<PipelineScheduleSchema & { variables?: PipelineVariableSchema[] }>()(
+    options?: { cronTimezone?: string; active?: boolean } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<PipelineScheduleSchema, C, E, void>> {
+    return RequestHelper.post<PipelineScheduleSchema>()(
       this,
       endpoint`projects/${projectId}/pipeline_schedules`,
       {
@@ -54,32 +57,67 @@ export class PipelineSchedules<C extends boolean = false> extends BaseResource<C
     );
   }
 
-  edit(projectId: string | number, scheduleId: number, options?: BaseRequestOptions) {
-    return RequestHelper.put<PipelineScheduleExtendedSchema>()(
+  edit<E extends boolean = false>(
+    projectId: string | number,
+    scheduleId: number,
+    options?: {
+      description?: string;
+      ref?: string;
+      cron?: string;
+      cronTimezone?: string;
+      active?: boolean;
+    } & Sudo &
+      ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<PipelineScheduleSchema, C, E, void>> {
+    return RequestHelper.put<PipelineScheduleSchema>()(
       this,
       endpoint`projects/${projectId}/pipeline_schedules/${scheduleId}`,
       options,
     );
   }
 
-  remove(projectId: string | number, scheduleId: number, options?: Sudo) {
-    return RequestHelper.del<PipelineScheduleExtendedSchema>()(
+  remove<E extends boolean = false>(
+    projectId: string | number,
+    scheduleId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<PipelineScheduleSchema, C, E, void>> {
+    return RequestHelper.del<PipelineScheduleSchema>()(
       this,
       endpoint`projects/${projectId}/pipeline_schedules/${scheduleId}`,
       options,
     );
   }
 
-  show(projectId: string | number, scheduleId: number, options?: Sudo) {
-    return RequestHelper.get<PipelineScheduleExtendedSchema>()(
+  run<E extends boolean = false>(
+    projectId: string | number,
+    scheduleId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<{ message: string }, C, E, void>> {
+    return RequestHelper.post<{ message: string }>()(
+      this,
+      endpoint`projects/${projectId}/pipeline_schedules/${scheduleId}/play`,
+      options,
+    );
+  }
+
+  show<E extends boolean = false>(
+    projectId: string | number,
+    scheduleId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<ExpandedPipelineScheduleSchema, C, E, void>> {
+    return RequestHelper.get<ExpandedPipelineScheduleSchema>()(
       this,
       endpoint`projects/${projectId}/pipeline_schedules/${scheduleId}`,
       options,
     );
   }
 
-  takeOwnership(projectId: string | number, scheduleId: number, options?: Sudo) {
-    return RequestHelper.post<PipelineScheduleExtendedSchema>()(
+  takeOwnership<E extends boolean = false>(
+    projectId: string | number,
+    scheduleId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<PipelineScheduleSchema, C, E, void>> {
+    return RequestHelper.post<PipelineScheduleSchema>()(
       this,
       endpoint`projects/${projectId}/pipeline_schedules/${scheduleId}/take_ownership`,
       options,

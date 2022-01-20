@@ -71,7 +71,8 @@ export interface NuGetSearchResultsSchema extends Record<string, unknown> {
 function url({ projectId, groupId }) {
   if (projectId) {
     return endpoint`/projects/${projectId}/packages/debian`;
-  } else if (groupId) {
+  }
+  if (groupId) {
     return endpoint`/groups/${groupId}/-/packages/debian`;
   }
 

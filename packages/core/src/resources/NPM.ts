@@ -24,9 +24,8 @@ export interface NPMPackageMetadataSchema extends Record<string, unknown> {
 function url(projectId?: string | number) {
   if (projectId) {
     return endpoint`/projects/${projectId}/packages/npm`;
-  } else {
-    return 'packages/npm';
   }
+  return 'packages/npm';
 }
 
 export class NPM<C extends boolean = false> extends BaseResource<C> {

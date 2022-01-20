@@ -29,10 +29,12 @@ export class Lint<C extends boolean = false> extends BaseResource<C> {
     content: string,
     options?: BaseRequestOptions<E>,
   ): Promise<GitlabAPIResponse<LintSchema, C, E, void>>;
+
   lint<E extends boolean = false>(
     content: string,
     options?: { projectId: string | number } & BaseRequestOptions<E>,
   ): Promise<GitlabAPIResponse<ContextualLintSchema, C, E, void>>;
+
   lint<E extends boolean = false>(
     content: string,
     { projectId, ...options }: { projectId?: string | number } & BaseRequestOptions<E> = {},

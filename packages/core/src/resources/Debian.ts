@@ -6,7 +6,8 @@ import type { ShowExpanded, GitlabAPIResponse } from '../infrastructure';
 function url({ projectId, groupId }) {
   if (projectId) {
     return endpoint`/projects/${projectId}/packages/debian`;
-  } else if (groupId) {
+  }
+  if (groupId) {
     return endpoint`/groups/${groupId}/-/packages/debian`;
   }
 
@@ -28,14 +29,14 @@ export class Debian<C extends boolean = false> extends BaseResource<C> {
     ) &
       ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
-    if (!projectId && !groupId) throw new Error('groupId or projectId must be given');
+    const uri = url({
+      projectId,
+      groupId,
+    });
 
     return RequestHelper.get<Blob>()(
       this,
-      `${url({
-        projectId,
-        groupId,
-      })}/dists/${distribution}/${component}/binary-${architecture}/Packages`,
+      `${uri}/dists/${distribution}/${component}/binary-${architecture}/Packages`,
       options as ShowExpanded<E>,
     );
   }
@@ -52,11 +53,14 @@ export class Debian<C extends boolean = false> extends BaseResource<C> {
     ) &
       ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
-    if (!projectId && !groupId) throw new Error('groupId or projectId must be given');
+    const uri = url({
+      projectId,
+      groupId,
+    });
 
     return RequestHelper.get<Blob>()(
       this,
-      `${url({ projectId, groupId })}/dists/${distribution}/Release`,
+      `${uri}/dists/${distribution}/Release`,
       options as ShowExpanded<E>,
     );
   }
@@ -73,11 +77,14 @@ export class Debian<C extends boolean = false> extends BaseResource<C> {
     ) &
       ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
-    if (!projectId && !groupId) throw new Error('groupId or projectId must be given');
+    const uri = url({
+      projectId,
+      groupId,
+    });
 
     return RequestHelper.get<Blob>()(
       this,
-      `${url({ projectId, groupId })}/dists/${distribution}/InRelease`,
+      `${uri}/dists/${distribution}/InRelease`,
       options as ShowExpanded<E>,
     );
   }
@@ -94,11 +101,14 @@ export class Debian<C extends boolean = false> extends BaseResource<C> {
     ) &
       ShowExpanded<E>,
   ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
-    if (!projectId && !groupId) throw new Error('groupId or projectId must be given');
+    const uri = url({
+      projectId,
+      groupId,
+    });
 
     return RequestHelper.get<Blob>()(
       this,
-      `${url({ projectId, groupId })}/dists/${distribution}/Release.gpg`,
+      `${uri}/dists/${distribution}/Release.gpg`,
       options as ShowExpanded<E>,
     );
   }

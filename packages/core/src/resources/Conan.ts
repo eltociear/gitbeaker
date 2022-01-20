@@ -18,9 +18,8 @@ export interface RecipeSnapshotSchema extends Record<string, unknown> {
 function url(projectId?: string | number) {
   if (projectId) {
     return endpoint`/projects/${projectId}/packages/conan/v1`;
-  } else {
-    return '/packages/conan/v1';
   }
+  return '/packages/conan/v1';
 }
 
 export class Conan<C extends boolean = false> extends BaseResource<C> {

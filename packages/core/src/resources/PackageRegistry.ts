@@ -36,6 +36,7 @@ export class PackageRegistry<C extends boolean = false> extends BaseResource<C> 
     content: string,
     options: { select: 'package_file'; contentType?: string; status?: 'default' | 'hidden' },
   ): Promise<GitlabAPIResponse<PackageRegistrySchema, C, E, void>>;
+
   publish<E extends boolean = false>(
     projectId: string | number,
     packageName: string,
@@ -44,6 +45,7 @@ export class PackageRegistry<C extends boolean = false> extends BaseResource<C> 
     content: string,
     options: { contentType?: string; status?: 'default' | 'hidden' },
   ): Promise<GitlabAPIResponse<{ message: string }, C, E, void>>;
+
   publish<E extends boolean = false>(
     projectId: string | number,
     packageName: string,
