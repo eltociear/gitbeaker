@@ -18,6 +18,7 @@ export interface RepositoryStorageMoveSchema {
 
 export class ResourceRepositoryStorageMoves<C extends boolean = false> extends BaseResource<C> {
   protected resourceType: string;
+
   protected resourceTypeSingular: string;
 
   constructor(resourceType: string, options: BaseResourceOptions<C>) {
