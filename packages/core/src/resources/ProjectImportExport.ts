@@ -1,6 +1,13 @@
-import { BaseResource } from '@gitbeaker/requester-utils';
 import * as Mime from 'mime/lite';
-import { RequestHelper, Sudo, BaseRequestOptions, endpoint } from '../infrastructure';
+import { BaseResource } from '@gitbeaker/requester-utils';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
+  BaseRequestOptions,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+  UploadMetadataOptions,
+} from '../infrastructure';
 
 export interface ExportStatusSchema extends Record<string, unknown> {
   id: number;
@@ -39,21 +46,47 @@ export interface ImportStatusSchema extends Record<string, unknown> {
   failed_relations?: FailedRelationSchema[];
 }
 
-export interface UploadMetadata {
-  filename?: string;
-  contentType?: string;
-}
-
-export const defaultMetadata = {
-  filename: `${Date.now().toString()}.tar.gz`,
-};
-
 export class ProjectImportExport<C extends boolean = false> extends BaseResource<C> {
-  download(projectId: string | number, options?: Sudo) {
-    return RequestHelper.get()(this, endpoint`projects/${projectId}/export/download`, options);
+  download<E extends boolean = false>(
+    projectId: string | number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+    return RequestHelper.get<Blob>()(
+      this,
+      endpoint`projects/${projectId}/export/download`,
+      options,
+    );
   }
 
-  exportStatus(projectId: string | number, options?: Sudo) {
+  // TODO: What does this return?
+  import<E extends boolean = false>(
+    content: string,
+    name: string,
+    path: string,
+    {
+      metadata,
+      parentId,
+      ...options
+    }: { parentId?: number; metadata?: UploadMetadataOptions } & Sudo & ShowExpanded<E> = {},
+  ): Promise<GitlabAPIResponse<unknown, C, E, void>> {
+    const meta = {
+      filename: `${Date.now().toString()}.tar.gz`,
+      ...metadata,
+    };
+
+    if (!meta.contentType) meta.contentType = Mime.getType(meta.filename) || undefined;
+
+    return RequestHelper.post<unknown>()(this, 'projects/import', {
+      isForm: true,
+      ...options,
+      file: [content, meta],
+      path,
+      name,
+      parentId,
+    });
+  }
+
+  showExportStatus(projectId: string | number, options?: Sudo) {
     return RequestHelper.get<ExportStatusSchema>()(
       this,
       endpoint`projects/${projectId}/export`,
@@ -61,24 +94,7 @@ export class ProjectImportExport<C extends boolean = false> extends BaseResource
     );
   }
 
-  import(
-    content: string,
-    path: string,
-    { metadata, ...options }: { metadata?: UploadMetadata } & BaseRequestOptions = {},
-  ) {
-    const meta = { ...defaultMetadata, ...metadata };
-
-    if (!meta.contentType) meta.contentType = Mime.getType(meta.filename) || undefined;
-
-    return RequestHelper.post<ImportStatusSchema>()(this, 'projects/import', {
-      isForm: true,
-      ...options,
-      file: [content, meta],
-      path,
-    });
-  }
-
-  importStatus(projectId: string | number, options?: Sudo) {
+  showImportStatus(projectId: string | number, options?: Sudo) {
     return RequestHelper.get<ImportStatusSchema>()(
       this,
       endpoint`projects/${projectId}/import`,
@@ -86,7 +102,10 @@ export class ProjectImportExport<C extends boolean = false> extends BaseResource
     );
   }
 
-  scheduleExport(projectId: string | number, options?: BaseRequestOptions<E>) {
+  scheduleExport<E extends boolean = false>(
+    projectId: string | number,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<{ message: string }, C, E, void>> {
     return RequestHelper.post<{ message: string }>()(
       this,
       endpoint`projects/${projectId}/export`,

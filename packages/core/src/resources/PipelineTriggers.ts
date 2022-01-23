@@ -51,7 +51,11 @@ export class PipelineTriggers<C extends boolean = false> extends BaseResource<C>
     );
   }
 
-  remove(projectId: string | number, pipelineId: number, options?: Sudo) {
+  removet<E extends boolean = false>(
+    projectId: string | number,
+    pipelineId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
       endpoint`projects/${projectId}/pipelines/${pipelineId}`,

@@ -28,7 +28,7 @@ export class GroupLDAPLinks<C extends boolean = false> extends BaseResource<C> {
     return RequestHelper.get<string[]>()(
       this,
       endpoint`groups/${groupId}/ldap_group_links`,
-      options as PaginatedRequestOptions<E, P>,
+      options,
     );
   }
 

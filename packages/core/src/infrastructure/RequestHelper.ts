@@ -151,7 +151,7 @@ async function getHelper<E extends boolean = false, P extends 'keyset' | 'offset
 
   if (!showExpanded) return newAcc;
 
-  if (query.pagination === 'keyset') {
+  if (query.pagination !== 'keyset') {
     return {
       data: newAcc,
       paginationInfo: {
@@ -164,11 +164,15 @@ async function getHelper<E extends boolean = false, P extends 'keyset' | 'offset
       },
     };
   }
+
   return {
     data: newAcc,
     paginationInfo: {
-      idAfter: parseInt(next.id_after, 10),
-      cursor: parseInt(next.cursor, 10) || null,
+      idAfter: qs['id_after'] && parseInt(qs['id_after'] as string, 10),
+      cursor: qs.cursor,
+      perPage: qs['per_page'] && parseInt(qs['per_page'] as string, 10),
+      orderBy: qs['order_by'],
+      sort: qs['sort'],
     },
   };
 }

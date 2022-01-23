@@ -157,6 +157,7 @@ export class Groups<C extends boolean = false> extends BaseResource<C> {
     groupId: string | number,
     options: { simple: true; sharedOnly?: boolean } & PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<CondensedProjectSchema[], C, E, P>>;
+
   projects<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     groupId: string | number,
     options?: PaginatedRequestOptions<E, P>,
@@ -220,6 +221,7 @@ export class Groups<C extends boolean = false> extends BaseResource<C> {
     groupId: string | number,
     options: { simple: true } & PaginatedRequestOptions<E, P>,
   ): Promise<GitlabAPIResponse<CondensedProjectSchema[], C, E, P>>;
+
   sharedProjects<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
     groupId: string | number,
     options: PaginatedRequestOptions<E, P>,

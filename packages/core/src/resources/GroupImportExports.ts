@@ -1,8 +1,13 @@
 import * as Mime from 'mime/lite';
 import { BaseResource } from '@gitbeaker/requester-utils';
 import { endpoint, RequestHelper } from '../infrastructure';
-import type { BaseRequestOptions, Sudo, ShowExpanded, GitlabAPIResponse } from '../infrastructure';
-import type { UploadMetadata } from './types';
+import type {
+  BaseRequestOptions,
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+  UploadMetadataOptions,
+} from '../infrastructure';
 
 export class GroupImportExports<C extends boolean = false> extends BaseResource<C> {
   download<E extends boolean = false>(
@@ -21,7 +26,7 @@ export class GroupImportExports<C extends boolean = false> extends BaseResource<
       metadata,
       parentId,
       ...options
-    }: { parentId?: number; metadata?: UploadMetadata } & Sudo & ShowExpanded<E> = {},
+    }: { parentId?: number; metadata?: UploadMetadataOptions } & Sudo & ShowExpanded<E> = {},
   ): Promise<GitlabAPIResponse<unknown, C, E, void>> {
     const meta = {
       filename: `${Date.now().toString()}.tar.gz`,
