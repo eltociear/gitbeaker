@@ -7,7 +7,7 @@ import type {
   GitlabAPIResponse,
 } from '../infrastructure';
 
-export interface NamespaceSchema extends Record<string, unknown> {
+export interface CondensedNamespaceSchema extends Record<string, unknown> {
   id: number;
   name: string;
   path: string;
@@ -16,6 +16,9 @@ export interface NamespaceSchema extends Record<string, unknown> {
   parent_id?: number;
   avatar_url: string;
   web_url: string;
+}
+
+export interface NamespaceSchema extends CondensedNamespaceSchema {
   members_count_with_descendants: number;
   billable_members_count: number;
   plan: string;
