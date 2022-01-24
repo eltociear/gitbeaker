@@ -27,6 +27,7 @@ export class ProjectRemoteMirrors<C extends boolean = false> extends BaseResourc
     );
   }
 
+  // Helper method - Duplicated from Projects
   createPullMirror<E extends boolean = false>(
     projectId: string | number,
     url: string,

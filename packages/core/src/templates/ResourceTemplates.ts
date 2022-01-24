@@ -16,6 +16,11 @@ export interface TemplateSchema extends Record<string, unknown> {
 export class ResourceTemplates<C extends boolean = false> extends BaseResource<C> {
   constructor(resourceType: string, options: BaseResourceOptions<C>) {
     super({ prefixUrl: ['templates', resourceType].join('/'), ...options });
+
+    process.emitWarning(
+      'This API will be deprecated as of Gitlabs v5 API. Please make the switch to "ProjectTemplates".',
+      'DeprecationWarning',
+    );
   }
 
   all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
