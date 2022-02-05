@@ -11,10 +11,8 @@ import { GroupMilestones } from './GroupMilestones';
 import { GroupRunners } from './GroupRunners';
 import { GroupVariables } from './GroupVariables';
 import { GroupLabels } from './GroupLabels';
-import { GroupDeployTokens } from './GroupDeployTokens';
 import { Epics } from './Epics';
 import { EpicIssues } from './EpicIssues';
-import { EpicLinks } from './EpicLinks';
 import { EpicNotes } from './EpicNotes';
 import { EpicDiscussions } from './EpicDiscussions';
 import { Users } from './Users';
@@ -38,7 +36,6 @@ import { IssueNoteAwardEmojis } from './IssueNoteAwardEmojis';
 import { IssueDiscussions } from './IssueDiscussions';
 import { IssueAwardEmojis } from './IssueAwardEmojis';
 import { Jobs } from './Jobs';
-import { Labels } from './Labels';
 import { MergeRequests } from './MergeRequests';
 import { MergeRequestApprovals } from './MergeRequestApprovals';
 import { MergeRequestAwardEmojis } from './MergeRequestAwardEmojis';
@@ -65,15 +62,12 @@ import { ProjectSnippetAwardEmojis } from './ProjectSnippetAwardEmojis';
 import { ProtectedBranches } from './ProtectedBranches';
 import { ProtectedTags } from './ProtectedTags';
 import { ProjectVariables } from './ProjectVariables';
-import { ProjectDeployTokens } from './ProjectDeployTokens';
-import { PushRules } from './PushRules';
 import { Releases } from './Releases';
 import { ReleaseLinks } from './ReleaseLinks';
 import { Repositories } from './Repositories';
 import { RepositoryFiles } from './RepositoryFiles';
 import { RepositorySubmodules } from './RepositorySubmodules';
 import { Runners } from './Runners';
-import { Services } from './Services';
 import { Tags } from './Tags';
 import { Todos } from './Todos';
 import { Triggers } from './Triggers';
@@ -98,12 +92,11 @@ import { SidekiqMetrics } from './SidekiqMetrics';
 import { Snippets } from './Snippets';
 import { SystemHooks } from './SystemHooks';
 import { Version } from './Version';
-import { Wikis } from './Wikis';
 
 // Figure out a better way of doing this using mapped types: https://stackoverflow.com/questions/67729408/how-to-create-mapped-type-using-generic-class-instances-in-typesscript?noredirect=1#comment119718863_67729408
 // This will most likely be accomplished using higher kinded types: https://github.com/Microsoft/TypeScript/issues/1213#issuecomment-750930496
 
-type BundledService<C extends boolean = false> = {
+export interface Gitlab<C extends boolean = false> {
   Groups: Groups<C>;
   GroupAccessRequests: GroupAccessRequests<C>;
   GroupBadges: GroupBadges<C>;
@@ -114,10 +107,8 @@ type BundledService<C extends boolean = false> = {
   GroupRunners: GroupRunners<C>;
   GroupVariables: GroupVariables<C>;
   GroupLabels: GroupLabels<C>;
-  GroupDeployTokens: GroupDeployTokens<C>;
   Epics: Epics<C>;
   EpicIssues: EpicIssues<C>;
-  EpicLinks: EpicLinks<C>;
   EpicNotes: EpicNotes<C>;
   EpicDiscussions: EpicDiscussions<C>;
   Users: Users<C>;
@@ -141,7 +132,6 @@ type BundledService<C extends boolean = false> = {
   IssueDiscussions: IssueDiscussions<C>;
   IssueAwardEmojis: IssueAwardEmojis<C>;
   Jobs: Jobs<C>;
-  Labels: Labels<C>;
   MergeRequests: MergeRequests<C>;
   MergeRequestApprovals: MergeRequestApprovals<C>;
   MergeRequestAwardEmojis: MergeRequestAwardEmojis<C>;
@@ -168,15 +158,12 @@ type BundledService<C extends boolean = false> = {
   ProtectedBranches: ProtectedBranches<C>;
   ProtectedTags: ProtectedTags<C>;
   ProjectVariables: ProjectVariables<C>;
-  ProjectDeployTokens: ProjectDeployTokens<C>;
-  PushRules: PushRules<C>;
   Releases: Releases<C>;
   ReleaseLinks: ReleaseLinks<C>;
   Repositories: Repositories<C>;
   RepositoryFiles: RepositoryFiles<C>;
   RepositorySubmodules: RepositorySubmodules<C>;
   Runners: Runners<C>;
-  Services: Services<C>;
   Tags: Tags<C>;
   Todos: Todos<C>;
   Triggers: Triggers<C>;
@@ -201,7 +188,6 @@ type BundledService<C extends boolean = false> = {
   Snippets: Snippets<C>;
   SystemHooks: SystemHooks<C>;
   Version: Version<C>;
-  Wikis: Wikis<C>;
 };
 
 const resources = {
@@ -215,10 +201,8 @@ const resources = {
   GroupRunners,
   GroupVariables,
   GroupLabels,
-  GroupDeployTokens,
   Epics,
   EpicIssues,
-  EpicLinks,
   EpicNotes,
   EpicDiscussions,
   Users,
@@ -242,7 +226,6 @@ const resources = {
   IssueDiscussions,
   IssueAwardEmojis,
   Jobs,
-  Labels,
   MergeRequests,
   MergeRequestApprovals,
   MergeRequestAwardEmojis,
@@ -269,15 +252,12 @@ const resources = {
   ProtectedBranches,
   ProtectedTags,
   ProjectVariables,
-  ProjectDeployTokens,
-  PushRules,
   Releases,
   ReleaseLinks,
   Repositories,
   RepositoryFiles,
   RepositorySubmodules,
   Runners,
-  Services,
   Tags,
   Todos,
   Triggers,
@@ -302,13 +282,10 @@ const resources = {
   Snippets,
   SystemHooks,
   Version,
-  Wikis,
 };
 
-export class Gitlab<C extends boolean = false> extends (class {} as new () => BundledService) {
+export class Gitlab<C extends boolean = false> {
   constructor(options: BaseResourceOptions<C>) {
-    super();
-
     Object.keys(resources).forEach((s) => {
       this[s] = new resources[s]<C>(options);
     });
