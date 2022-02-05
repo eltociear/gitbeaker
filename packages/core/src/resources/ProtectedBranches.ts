@@ -1,11 +1,6 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import {
-  BaseRequestOptions,
-  endpoint,
-  PaginatedRequestOptions,
-  RequestHelper,
-  Sudo,
-} from '../infrastructure';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type { BaseRequestOptions, Sudo, ShowExpanded, GitlabAPIResponse } from '../infrastructure';
 
 export interface ProtectedBranchAccessLevel {
   access_level: 0 | 30 | 40 | 60;
@@ -19,12 +14,16 @@ export interface ProtectedBranchSchema extends Record<string, unknown> {
   name: string;
   push_access_levels?: ProtectedBranchAccessLevel[];
   merge_access_levels?: ProtectedBranchAccessLevel[];
+  unprotect_access_levels?: ProtectedBranchAccessLevel[];
   allow_force_push: boolean;
   code_owner_approval_required: boolean;
 }
 
 export class ProtectedBranches<C extends boolean = false> extends BaseResource<C> {
-  all(projectId: string | number, options: { search?: string } & PaginatedRequestOptions = {}) {
+  all<E extends boolean = false>(
+    projectId: string | number,
+    options: { search?: string } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<ProtectedBranchSchema[], C, E, void>> {
     return RequestHelper.get<ProtectedBranchSchema[]>()(
       this,
       endpoint`projects/${projectId}/protected_branches`,
@@ -32,20 +31,44 @@ export class ProtectedBranches<C extends boolean = false> extends BaseResource<C
     );
   }
 
-  protect(projectId: string | number, branchName: string, options?: BaseRequestOptions) {
+  edit<E extends boolean = false>(
+    projectId: string | number,
+    branchName: string,
+    options?: { codeOwnerApprovalRequired?: boolean } & Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<ProtectedBranchSchema, C, E, void>> {
+    return RequestHelper.patch<ProtectedBranchSchema>()(
+      this,
+      endpoint`projects/${projectId}/protected_branches/${branchName}`,
+      options,
+    );
+  }
+
+  protect<E extends boolean = false>(
+    projectId: string | number,
+    branchName: string,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<ProtectedBranchSchema, C, E, void>> {
+    const { sudo, showExpanded, ...opts } = options || {};
+
     return RequestHelper.post<ProtectedBranchSchema>()(
       this,
       endpoint`projects/${projectId}/protected_branches`,
       {
         query: {
           name: branchName,
-          ...options,
+          ...opts,
         },
+        sudo,
+        showExpanded,
       },
     );
   }
 
-  show(projectId: string | number, branchName: string, options?: Sudo) {
+  show<E extends boolean = false>(
+    projectId: string | number,
+    branchName: string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<ProtectedBranchSchema, C, E, void>> {
     return RequestHelper.get<ProtectedBranchSchema>()(
       this,
       endpoint`projects/${projectId}/protected_branches/${branchName}`,
@@ -53,7 +76,11 @@ export class ProtectedBranches<C extends boolean = false> extends BaseResource<C
     );
   }
 
-  unprotect(projectId: string | number, branchName: string, options?: Sudo) {
+  unprotect<E extends boolean = false>(
+    projectId: string | number,
+    branchName: string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
       endpoint`projects/${projectId}/protected_branches/${branchName}`,

@@ -1,14 +1,15 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { UserSchema } from './Users';
-import { CommitSchema } from './Commits';
-import { MilestoneSchema } from '../templates/types';
-import {
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
   BaseRequestOptions,
-  endpoint,
   PaginatedRequestOptions,
-  RequestHelper,
   Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
 } from '../infrastructure';
+import type { UserSchema } from './Users';
+import type { CommitSchema } from './Commits';
+import type { MilestoneSchema } from '../templates/types';
 
 export interface ReleaseEvidence {
   sha: string;
@@ -36,7 +37,7 @@ export interface ReleaseSchema extends Record<string, unknown> {
   description_html: string;
   created_at: string;
   released_at: string;
-  user: Pick<UserSchema, 'name' | 'username' | 'id' | 'state' | 'avatar_url' | 'web_url'>;
+  user: Omit<UserSchema, 'created_at'>;
   commit: CommitSchema;
   milestones?: MilestoneSchema[];
   commit_path: string;
@@ -50,9 +51,11 @@ export interface ReleaseSchema extends Record<string, unknown> {
   evidences?: ReleaseEvidence[];
 }
 
-// TODO: Add missing functions
 export class Releases<C extends boolean = false> extends BaseResource<C> {
-  all(projectId: string | number, options?: PaginatedRequestOptions) {
+  all<E extends boolean = false, P extends 'keyset' | 'offset' = 'offset'>(
+    projectId: string | number,
+    options?: PaginatedRequestOptions<E, P>,
+  ): Promise<GitlabAPIResponse<ReleaseSchema[], C, E, P>> {
     return RequestHelper.get<ReleaseSchema[]>()(
       this,
       endpoint`projects/${projectId}/releases`,
@@ -60,7 +63,7 @@ export class Releases<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  create(projectId: string | number, options?: BaseRequestOptions) {
+  create<E extends boolean = false>(projectId: string | number, options?: BaseRequestOptions<E>): Promise<GitlabAPIResponse<ReleaseSchema, C, E, void>> {
     return RequestHelper.post<ReleaseSchema>()(
       this,
       endpoint`projects/${projectId}/releases`,
@@ -68,7 +71,19 @@ export class Releases<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  edit(projectId: string | number, tagName: string, options?: BaseRequestOptions) {
+  createEvidence<E extends boolean = false>(projectId: string | number, tagName: string, options?: Sudo & ShowExpanded<E>): Promise<GitlabAPIResponse<number, C, E, void>> {
+    return RequestHelper.post<number>()(
+      this,
+      endpoint`projects/${projectId}/releases/${tagName}/evidence`,
+      options,
+    );
+  }
+
+  edit<E extends boolean = false>(
+    projectId: string | number,
+    tagName: string,
+    options?: BaseRequestOptions<E>,
+  ): Promise<GitlabAPIResponse<ReleaseSchema, C, E, void>> {
     return RequestHelper.put<ReleaseSchema>()(
       this,
       endpoint`projects/${projectId}/releases/${tagName}`,
@@ -76,11 +91,11 @@ export class Releases<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  remove(projectId: string | number, tagName: string, options?: Sudo) {
+  remove<E extends boolean = false>(projectId: string | number, tagName: string, options?: Sudo & ShowExpanded<E>): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(this, endpoint`projects/${projectId}/releases/${tagName}`, options);
   }
 
-  show(projectId: string | number, tagName: string, options?: Sudo) {
+  show<E extends boolean = false>(projectId: string | number, tagName: string, options?: {includeHtmlDescription?: boolean } & Sudo & ShowExpanded<E>): Promise<GitlabAPIResponse<ReleaseSchema, C, E, void>> {
     return RequestHelper.get<ReleaseSchema>()(
       this,
       endpoint`projects/${projectId}/releases/${tagName}`,
