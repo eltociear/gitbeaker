@@ -53,7 +53,7 @@ export class Conan<C extends boolean = false> extends BaseResource<C> {
     packageRevision: string,
     filename: string,
     options?: { projectId?: string | number } & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
       `${url(
@@ -71,7 +71,7 @@ export class Conan<C extends boolean = false> extends BaseResource<C> {
     recipeRevision: string,
     filename: string,
     options?: { projectId?: string | number } & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
       `${url(

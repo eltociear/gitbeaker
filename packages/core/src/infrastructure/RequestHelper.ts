@@ -77,7 +77,7 @@ export type GitlabAPIExpandedResponse<T, E extends boolean, P> = E extends true
     : ExpandedResponse<T>
   : T;
 
-export type GitlabAPISingleResponse<T, C extends boolean, E extends boolean> = T extends Record<
+export type GitlabAPISingleResponse<T, C extends boolean | void, E extends boolean> = T extends Record<
   string,
   unknown
 >
@@ -86,7 +86,7 @@ export type GitlabAPISingleResponse<T, C extends boolean, E extends boolean> = T
 
 export type GitlabAPIMultiResponse<
   T,
-  C extends boolean,
+  C extends boolean | void,
   E extends boolean,
   P extends 'keyset' | 'offset' | void,
 > = T extends Record<string, unknown>
@@ -95,7 +95,7 @@ export type GitlabAPIMultiResponse<
 
 export type GitlabAPIResponse<
   T,
-  C extends boolean,
+  C extends boolean | void,
   E extends boolean,
   P extends 'keyset' | 'offset' | void,
 > = T extends (infer R)[] ? GitlabAPIMultiResponse<R, C, E, P> : GitlabAPISingleResponse<T, C, E>;

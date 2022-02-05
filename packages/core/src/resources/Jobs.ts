@@ -129,7 +129,7 @@ export class Jobs<C extends boolean = false> extends BaseResource<C> {
     projectId: string | number,
     jobId: number,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
       endpoint`projects/${projectId}/jobs/${jobId}/trace`,

@@ -1,5 +1,10 @@
 import { BaseResource } from '@gitbeaker/requester-utils';
-import { RequestHelper, PaginatedRequestOptions, Sudo, endpoint } from '../infrastructure';
+import { endpoint, RequestHelper } from '../infrastructure';
+import type {
+  Sudo,
+  ShowExpanded,
+  GitlabAPIResponse,
+} from '../infrastructure';
 
 export interface ReleaseLinkSchema extends Record<string, unknown> {
   id: number;
@@ -10,7 +15,11 @@ export interface ReleaseLinkSchema extends Record<string, unknown> {
 }
 
 export class ReleaseLinks<C extends boolean = false> extends BaseResource<C> {
-  all(projectId: string | number, tagName: string, options?: PaginatedRequestOptions) {
+  all<E extends boolean = false>(
+    projectId: string | number,
+    tagName: string,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<ReleaseLinkSchema[], C, E, void>> {
     return RequestHelper.get<ReleaseLinkSchema[]>()(
       this,
       endpoint`projects/${projectId}/releases/${tagName}/assets/links`,
@@ -18,13 +27,13 @@ export class ReleaseLinks<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  create(
+  create<E extends boolean = false>(
     projectId: string | number,
     tagName: string,
     name: string,
     url: string,
     options?: Sudo & { filePath?: string; linkType?: string },
-  ) {
+  ): Promise<GitlabAPIResponse<ReleaseLinkSchema, C, E, void>> {
     return RequestHelper.post<ReleaseLinkSchema>()(
       this,
       endpoint`projects/${projectId}/releases/${tagName}/assets/links`,
@@ -36,12 +45,12 @@ export class ReleaseLinks<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  edit(
+  edit<E extends boolean = false>(
     projectId: string | number,
     tagName: string,
     linkId: number,
-    options?: Sudo & { name?: string; url?: string; filePath?: string; linkType?: string },
-  ) {
+    options?: Sudo & ShowExpanded<E> & { name?: string; url?: string; filePath?: string; linkType?: string },
+  ): Promise<GitlabAPIResponse<ReleaseLinkSchema, C, E, void>> {
     return RequestHelper.put<ReleaseLinkSchema>()(
       this,
       endpoint`projects/${projectId}/releases/${tagName}/assets/links/${linkId}`,
@@ -49,7 +58,12 @@ export class ReleaseLinks<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  remove(projectId: string | number, tagName: string, linkId: number, options?: Sudo) {
+  remove<E extends boolean = false>(
+    projectId: string | number,
+    tagName: string,
+    linkId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ): Promise<GitlabAPIResponse<void, C, E, void>> {
     return RequestHelper.del()(
       this,
       endpoint`projects/${projectId}/releases/${tagName}/assets/links/${linkId}`,
@@ -57,7 +71,12 @@ export class ReleaseLinks<C extends boolean = false> extends BaseResource<C> {
     );
   }
 
-  show(projectId: string | number, tagName: string, linkId: number, options?: Sudo) {
+  show<E extends boolean = false>(
+    projectId: string | number,
+    tagName: string,
+    linkId: number,
+    options?: Sudo & ShowExpanded<E>,
+  ) {
     return RequestHelper.get<ReleaseLinkSchema>()(
       this,
       endpoint`projects/${projectId}/releases/${tagName}/assets/links/${linkId}`,

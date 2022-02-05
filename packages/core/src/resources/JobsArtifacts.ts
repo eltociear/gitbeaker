@@ -19,7 +19,7 @@ export class JobArtifacts<C extends boolean = false> extends BaseResource<C> {
       | { artifactPath: string; ref: string; job: string; jobId: never }
     ) & { jobToken?: string } & Sudo &
       ShowExpanded<E> = {},
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     if (!this.headers['job-token'] && !jobToken)
       throw new Error('Missing required header "job-token" or jobToken argument');
 
@@ -48,7 +48,7 @@ export class JobArtifacts<C extends boolean = false> extends BaseResource<C> {
     ref: string,
     job: string,
     { jobToken, ...options }: { jobToken?: string } & Sudo & ShowExpanded<E> = {},
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     if (!this.headers['job-token'] && !jobToken)
       throw new Error('Missing required header "job-token" or jobToken argument');
 

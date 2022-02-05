@@ -101,7 +101,7 @@ export class Groups<C extends boolean = false> extends BaseResource<C> {
   downloadAvatar<E extends boolean = false>(
     groupId: string | number,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(this, endpoint`groups/${groupId}/avatar`, options);
   }
 

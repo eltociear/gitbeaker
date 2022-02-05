@@ -12,7 +12,7 @@ export class Maven<C extends boolean = false> extends BaseResource<C> {
       groupId,
       ...options
     }: { projectId: string | number; groupId: string | number } & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     let url = endpoint`packages/maven/${path}/${filename}`;
 
     if (projectId) {

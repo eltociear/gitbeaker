@@ -50,7 +50,7 @@ export class ProjectImportExport<C extends boolean = false> extends BaseResource
   download<E extends boolean = false>(
     projectId: string | number,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
       endpoint`projects/${projectId}/export/download`,

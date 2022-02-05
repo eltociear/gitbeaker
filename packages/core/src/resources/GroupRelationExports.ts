@@ -14,7 +14,7 @@ export class GroupRelationExports<C extends boolean = false> extends BaseResourc
     groupId: string | number,
     relation: string,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(this, endpoint`groups/${groupId}/export_relations/download`, {
       query: { relation },
       ...options,

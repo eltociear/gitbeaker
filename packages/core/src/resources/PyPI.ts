@@ -15,7 +15,7 @@ export class PyPI<C extends boolean = false> extends BaseResource<C> {
       | { projectId: string | number; groupId?: never }
       | { groupId: string | number; projectId?: never }
     )  & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     let url = endpoint`packages/pypi/files/${sha}/${fileIdentifier}`;
 
     if (projectId) {

@@ -51,7 +51,7 @@ export class GeoNodes<C extends boolean = false> extends BaseResource<C> {
     moduleName: string,
     moduleVersion: string,
     options?: BaseRequestOptions<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
       endpoint`projects/${projectId}/packages/go/${moduleName}/@v/${moduleVersion}.zip`,

@@ -86,7 +86,7 @@ export class NuGet<C extends boolean = false> extends BaseResource<C> {
     packageVersion: string,
     filename: string,
     options?: ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
       endpoint`projects/${projectId}/packages/nuget/download/${packageName}/${packageVersion}/${filename}`,

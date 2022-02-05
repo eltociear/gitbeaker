@@ -28,7 +28,7 @@ export class Debian<C extends boolean = false> extends BaseResource<C> {
       | { groupId: string | number; projectId: never }
     ) &
       ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     const uri = url({
       projectId,
       groupId,
@@ -52,7 +52,7 @@ export class Debian<C extends boolean = false> extends BaseResource<C> {
       | { groupId: string | number; projectId: never }
     ) &
       ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     const uri = url({
       projectId,
       groupId,
@@ -76,7 +76,7 @@ export class Debian<C extends boolean = false> extends BaseResource<C> {
       | { groupId: string | number; projectId: never }
     ) &
       ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     const uri = url({
       projectId,
       groupId,
@@ -100,7 +100,7 @@ export class Debian<C extends boolean = false> extends BaseResource<C> {
       | { groupId: string | number; projectId: never }
     ) &
       ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     const uri = url({
       projectId,
       groupId,
@@ -121,7 +121,7 @@ export class Debian<C extends boolean = false> extends BaseResource<C> {
     packageVersion: string,
     filename: string,
     options?: ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
       endpoint`projects/${projectId}/packages/debian/pool/${distribution}/${letter}/${packageName}/${packageVersion}/${filename}`,

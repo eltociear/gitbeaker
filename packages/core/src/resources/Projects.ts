@@ -214,7 +214,7 @@ export class Projects<C extends boolean = false> extends BaseResource<C> {
   downloadSnapshot<E extends boolean = false>(
     projectId: string | number,
     options?: { wiki?: boolean } & Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(this, endpoint`projects/${projectId}/snapshot`, options);
   }
 

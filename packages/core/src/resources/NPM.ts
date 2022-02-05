@@ -34,7 +34,7 @@ export class NPM<C extends boolean = false> extends BaseResource<C> {
     packageName: string,
     filename: string,
     options?: ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
       endpoint`projects/${projectId}/packages/npm/${packageName}/-/${filename}`,

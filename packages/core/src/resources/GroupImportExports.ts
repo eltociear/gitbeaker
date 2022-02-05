@@ -13,7 +13,7 @@ export class GroupImportExports<C extends boolean = false> extends BaseResource<
   download<E extends boolean = false>(
     groupId: string | number,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(this, endpoint`groups/${groupId}/export/download`, options);
   }
 

@@ -66,7 +66,7 @@ export class Composer<C extends boolean = false> extends BaseResource<C> {
     packageName: string,
     sha: string,
     options?: ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
       endpoint`projects/${projectId}/packages/composer/archives/${packageName}`,

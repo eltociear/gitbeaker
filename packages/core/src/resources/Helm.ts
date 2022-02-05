@@ -13,7 +13,7 @@ export class Helm<C extends boolean = false> extends BaseResource<C> {
     projectId: string | number,
     channel: string,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
       endpoint`projects/${projectId}/packages/helm/${channel}/index.yaml`,
@@ -26,7 +26,7 @@ export class Helm<C extends boolean = false> extends BaseResource<C> {
     channel: string,
     filename: string,
     options?: Sudo & ShowExpanded<E>,
-  ): Promise<GitlabAPIResponse<Blob, C, E, void>> {
+  ): Promise<GitlabAPIResponse<Blob, void, E, void>> {
     return RequestHelper.get<Blob>()(
       this,
       endpoint`projects/${projectId}/packages/helm/${channel}/charts/${filename}.tgz`,
